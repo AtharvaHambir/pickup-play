@@ -63,11 +63,14 @@ const Auth = () => {
   };
 
   const supportedDomains = [
-    'neu.edu - Northeastern University',
-    'mit.edu - MIT',
+    'mit.edu - Massachusetts Institute of Technology',
     'harvard.edu - Harvard University',
     'bu.edu - Boston University',
-    'tufts.edu - Tufts University'
+    'northeastern.edu - Northeastern University',
+    'umb.edu - University of Massachusetts Boston',
+    'umass.edu - University of Massachusetts Amherst',
+    'umassd.edu - University of Massachusetts Dartmouth',
+    'uml.edu - University of Massachusetts Lowell'
   ];
 
   return (
@@ -75,7 +78,7 @@ const Auth = () => {
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
           <h1 className="text-3xl font-bold text-gray-900">PickupPlay</h1>
-          <p className="text-gray-600 mt-2">University Pickup Sports</p>
+          <p className="text-gray-600 mt-2">Massachusetts University Pickup Sports</p>
         </div>
 
         <Card>
@@ -158,7 +161,7 @@ const Auth = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm">Supported Universities</CardTitle>
+            <CardTitle className="text-sm">Supported Massachusetts Universities</CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="text-xs text-gray-600 space-y-1">
