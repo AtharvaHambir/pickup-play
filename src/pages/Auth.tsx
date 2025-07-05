@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -15,6 +15,7 @@ const Auth = () => {
   const [fullName, setFullName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [needsConfirmation, setNeedsConfirmation] = useState(false);
   
   const { signIn, signUp } = useAuth();
   const { toast } = useToast();
@@ -22,11 +23,26 @@ const Auth = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setNeedsConfirmation(false);
 
     try {
       let result;
       if (isLogin) {
         result = await signIn(email, password);
+        
+        if (result.error) {
+          console.error('Login error:', result.error);
+          toast({
+            title: "Login Failed",
+            description: result.error.message || "Please check your credentials and try again.",
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Welcome back!",
+            description: "You have been signed in successfully.",
+          });
+        }
       } else {
         if (!fullName.trim()) {
           toast({
@@ -36,22 +52,31 @@ const Auth = () => {
           });
           return;
         }
+        
         result = await signUp(email, password, fullName);
-      }
-
-      if (result.error) {
-        toast({
-          title: "Error",
-          description: result.error.message,
-          variant: "destructive"
-        });
-      } else if (!isLogin) {
-        toast({
-          title: "Success",
-          description: "Account created! Please check your email to verify your account.",
-        });
+        
+        if (result.error) {
+          console.error('Signup error:', result.error);
+          toast({
+            title: "Signup Failed",
+            description: result.error.message || "Please check your information and try again.",
+            variant: "destructive"
+          });
+        } else if (result.needsConfirmation) {
+          setNeedsConfirmation(true);
+          toast({
+            title: "Check Your Email",
+            description: "We've sent you a confirmation link. Please check your email to complete registration.",
+          });
+        } else {
+          toast({
+            title: "Account Created!",
+            description: "Welcome to PickupPlay! You can now access your university dashboard.",
+          });
+        }
       }
     } catch (error: any) {
+      console.error('Auth error:', error);
       toast({
         title: "Error",
         description: error.message || "An unexpected error occurred",
@@ -72,6 +97,37 @@ const Auth = () => {
     'umassd.edu - University of Massachusetts Dartmouth',
     'uml.edu - University of Massachusetts Lowell'
   ];
+
+  if (needsConfirmation) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
+            <CardTitle>Check Your Email</CardTitle>
+          </CardHeader>
+          <CardContent className="text-center space-y-4">
+            <p className="text-gray-600">
+              We've sent a confirmation link to <strong>{email}</strong>
+            </p>
+            <p className="text-sm text-gray-500">
+              Click the link in your email to complete your registration and access your university dashboard.
+            </p>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setNeedsConfirmation(false);
+                setIsLogin(true);
+              }}
+              className="w-full"
+            >
+              Back to Sign In
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
@@ -150,7 +206,10 @@ const Auth = () => {
             <div className="mt-4 text-center">
               <Button
                 variant="link"
-                onClick={() => setIsLogin(!isLogin)}
+                onClick={() => {
+                  setIsLogin(!isLogin);
+                  setNeedsConfirmation(false);
+                }}
                 className="text-sm"
               >
                 {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
@@ -161,7 +220,10 @@ const Auth = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm">Supported Massachusetts Universities</CardTitle>
+            <CardTitle className="text-sm flex items-center gap-2">
+              <AlertCircle className="h-4 w-4" />
+              Supported Massachusetts Universities
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="text-xs text-gray-600 space-y-1">
