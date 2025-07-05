@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
+import { Eye, EyeOff, CheckCircle } from 'lucide-react';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -86,17 +86,6 @@ const Auth = () => {
       setLoading(false);
     }
   };
-
-  const supportedDomains = [
-    'mit.edu - Massachusetts Institute of Technology',
-    'harvard.edu - Harvard University',
-    'bu.edu - Boston University',
-    'northeastern.edu - Northeastern University',
-    'umb.edu - University of Massachusetts Boston',
-    'umass.edu - University of Massachusetts Amherst',
-    'umassd.edu - University of Massachusetts Dartmouth',
-    'uml.edu - University of Massachusetts Lowell'
-  ];
 
   if (needsConfirmation) {
     return (
@@ -215,22 +204,6 @@ const Auth = () => {
                 {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
               </Button>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm flex items-center gap-2">
-              <AlertCircle className="h-4 w-4" />
-              Supported Massachusetts Universities
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="text-xs text-gray-600 space-y-1">
-              {supportedDomains.map((domain, index) => (
-                <li key={index}>• {domain}</li>
-              ))}
-            </ul>
           </CardContent>
         </Card>
       </div>
