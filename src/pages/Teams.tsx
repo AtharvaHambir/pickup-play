@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,24 +7,27 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUniversity } from '@/hooks/useUniversity';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, LogOut, Users, Crown, ArrowLeft } from 'lucide-react';
+import { Plus, LogOut, Users, Calendar } from 'lucide-react';
 import CreateTeamDialog from '@/components/CreateTeamDialog';
 import { Link } from 'react-router-dom';
 import { getMascotForDomain } from '@/utils/universityMascots';
 
-interface Team {
+interface TeamMember {
   id: string;
-  name: string;
-  description: string | null;
-  university_id: string;
-  created_by: string;
-  members: { user_id: string; role: string }[];
+  team_id: string;
+  user_id: string;
+  role: string;
+  joined_at: string;
 }
 
-interface Member {
+interface Team {
   id: string;
-  full_name: string;
-  email: string;
+  team_name: string;
+  university_id: string;
+  created_by_user_id: string;
+  created_at: string;
+  updated_at: string;
+  members: TeamMember[];
 }
 
 const Teams = () => {
@@ -35,50 +39,20 @@ const Teams = () => {
     queryKey: ['teams', university?.id],
     queryFn: async () => {
       if (!university?.id) return [];
-      
+
       const { data, error } = await supabase
         .from('teams')
         .select(`
           *,
-          members (user_id, role)
+          members:team_members(*)
         `)
-        .eq('university_id', university.id);
+        .eq('university_id', university.id)
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
       return data as Team[];
     },
-    enabled: !!university?.id
-  });
-
-  const { data: teamMembers, isLoading: membersLoading } = useQuery({
-    queryKey: ['teamMembers', teams?.map(team => team.id)],
-    queryFn: async () => {
-      if (!teams?.length) return [];
-  
-      const teamIds = teams.map(team => team.id);
-  
-      const { data, error } = await supabase
-        .from('members')
-        .select(`
-          *,
-          user:user_id (full_name, email)
-        `)
-        .in('team_id', teamIds);
-  
-      if (error) throw error;
-  
-      // Structure the data to easily map members to their teams
-      const membersByTeam: { [teamId: string]: any[] } = {};
-      data.forEach(member => {
-        if (!membersByTeam[member.team_id]) {
-          membersByTeam[member.team_id] = [];
-        }
-        membersByTeam[member.team_id].push(member);
-      });
-  
-      return membersByTeam;
-    },
-    enabled: !!teams?.length,
+    enabled: !!university?.id,
   });
 
   if (!university) {
@@ -155,27 +129,14 @@ const Teams = () => {
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <Link to="/" className="flex items-center text-gray-700 hover:text-blue-600 font-medium transition-colors">
-              <ArrowLeft className="h-5 w-5 mr-2" />
-              Back to Dashboard
-            </Link>
-            <h2 className="text-3xl font-bold text-gray-900 mt-2">
-              Teams at {university.name}
-            </h2>
-            <p className="text-gray-600">
-              Manage and join sports teams at your university.
-            </p>
-          </div>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-3xl font-bold text-gray-900">Teams</h2>
           <Button onClick={() => setCreateTeamOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Create Team
           </Button>
         </div>
 
-        {/* Teams List */}
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -186,34 +147,25 @@ const Teams = () => {
               <Card key={team.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">{team.name}</CardTitle>
+                    <CardTitle className="text-lg">{team.team_name}</CardTitle>
                     <Badge variant="secondary">
-                      {team.members.length} Members
+                      {team.created_by_user_id === userProfile?.id ? 'Leader' : 'Member'}
                     </Badge>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <p className="text-gray-600 text-sm">
-                    {team.description || 'No description provided.'}
-                  </p>
-                  <div>
-                    <h4 className="font-medium mb-2">Members</h4>
-                    {membersLoading ? (
-                      <p className="text-gray-500 text-sm">Loading members...</p>
-                    ) : (
-                      <div className="space-y-2">
-                        {teamMembers && teamMembers[team.id] ? (
-                          teamMembers[team.id].map((member) => (
-                            <div key={member.id} className="flex items-center space-x-2">
-                              <Crown className="h-4 w-4 text-yellow-500" />
-                              <span className="text-sm">{member.user.full_name}</span>
-                            </div>
-                          ))
-                        ) : (
-                          <p className="text-gray-500 text-sm">No members yet.</p>
-                        )}
-                      </div>
-                    )}
+                  <div className="flex items-center text-gray-600">
+                    <Users className="h-4 w-4 mr-2" />
+                    <span className="text-sm">
+                      {team.members?.length || 0} members
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-center text-gray-600">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    <span className="text-sm">
+                      Created {new Date(team.created_at).toLocaleDateString()}
+                    </span>
                   </div>
                 </CardContent>
               </Card>
@@ -223,22 +175,21 @@ const Teams = () => {
           <Card className="text-center py-12">
             <CardContent>
               <div className="text-gray-500 text-lg mb-4">
-                No teams created yet.
+                No teams created yet
               </div>
               <Button onClick={() => setCreateTeamOpen(true)}>
                 <Plus className="h-4 w-4 mr-2" />
-                Create the First Team
+                Create Your First Team
               </Button>
             </CardContent>
           </Card>
         )}
       </div>
 
-      {/* Create Team Dialog */}
-      <CreateTeamDialog
+      <CreateTeamDialog 
         open={createTeamOpen}
         onOpenChange={setCreateTeamOpen}
-        university={university}
+        universityId={university.id}
       />
     </div>
   );

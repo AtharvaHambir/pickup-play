@@ -49,7 +49,7 @@ export const universityMascots: Record<string, string> = {
   'ncsu.edu': '🐺', // Wolfpack
   'wfu.edu': '👹', // Demon Deacons
   'clemson.edu': '🐅', // Tigers
-  'usc.edu': '🐓', // Gamecocks
+  'gamecocks.edu': '🐓', // Gamecocks
   'uga.edu': '🐕', // Bulldogs
   'ufl.edu': '🐊', // Gators
   'fsu.edu': '🏹', // Seminoles
@@ -62,15 +62,12 @@ export const universityMascots: Record<string, string> = {
   'baylor.edu': '🐻', // Bears
   'ttu.edu': '🔴', // Red Raiders
   'ou.edu': '🏇', // Sooners
-  'osu.edu': '🤠', // Cowboys
-  'ku.edu': '🐦', // Jayhawks
+  'okstate.edu': '🤠', // Cowboys
   'ksu.edu': '🐱', // Wildcats
   'colorado.edu': '🦬', // Buffaloes
   'utah.edu': '🦅', // Utes
   'arizona.edu': '🐱', // Wildcats
   'asu.edu': '😈', // Sun Devils
-  'ucla.edu': '🐻', // Bruins
-  'usc.edu': '⚔️', // Trojans
   'oregon.edu': '🦆', // Ducks
   'uw.edu': '🐕', // Huskies
   'wsu.edu': '🐱', // Cougars

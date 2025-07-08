@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,13 +12,6 @@ import { LogOut, MapPin, Users, Clock, Calendar } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { getMascotForDomain } from '@/utils/universityMascots';
-
-interface Field {
-  id: string;
-  name: string;
-  location: string;
-  university_id: string;
-}
 
 interface Game {
   id: string;
@@ -142,8 +136,8 @@ const FieldSchedule = () => {
           fields.map((field) => (
             <Card key={field.id} className="mb-6">
               <CardHeader>
-                <CardTitle className="text-lg">{field.name}</CardTitle>
-                <p className="text-sm text-gray-500">{field.location}</p>
+                <CardTitle className="text-lg">{field.location_name}</CardTitle>
+                <p className="text-sm text-gray-500">Capacity: {field.capacity} people</p>
               </CardHeader>
               <CardContent>
                 <h3 className="text-xl font-semibold mb-3">Upcoming Games</h3>
@@ -151,10 +145,10 @@ const FieldSchedule = () => {
                   <div className="flex items-center justify-center py-6">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
                   </div>
-                ) : games && games.filter(game => game.location === field.name).length > 0 ? (
+                ) : games && games.filter(game => game.location === field.location_name).length > 0 ? (
                   <div className="space-y-4">
                     {games
-                      .filter(game => game.location === field.name)
+                      .filter(game => game.location === field.location_name)
                       .map((game) => (
                         <div key={game.id} className="p-4 border rounded-md">
                           <div className="flex items-center justify-between">
