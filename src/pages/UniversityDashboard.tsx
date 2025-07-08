@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,6 +10,8 @@ import { Plus, LogOut, MapPin, Clock, Users, Calendar } from 'lucide-react';
 import CreateGameDialog from '@/components/CreateGameDialog';
 import GameDetailsDialog from '@/components/GameDetailsDialog';
 import { format } from 'date-fns';
+import { Link } from 'react-router-dom';
+import { getMascotForDomain } from '@/utils/universityMascots';
 
 interface Game {
   id: string;
@@ -75,6 +76,8 @@ const UniversityDashboard = () => {
     );
   }
 
+  const mascot = getMascotForDomain(university.domain);
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -89,12 +92,29 @@ const UniversityDashboard = () => {
                 {university.short_name.substring(0, 2).toUpperCase()}
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">PickupPlay</h1>
+                <div className="flex items-center space-x-2">
+                  <h1 className="text-2xl font-bold text-gray-900">PickupPlay</h1>
+                  <span className="text-2xl">{mascot}</span>
+                </div>
                 <p className="text-sm text-gray-600">{university.name}</p>
               </div>
             </div>
             
             <div className="flex items-center space-x-4">
+              <nav className="hidden md:flex items-center space-x-6">
+                <Link 
+                  to="/teams" 
+                  className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
+                >
+                  Teams
+                </Link>
+                <Link 
+                  to="/field-schedule" 
+                  className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
+                >
+                  Fields
+                </Link>
+              </nav>
               <span className="text-sm text-gray-600">
                 {userProfile?.full_name}
               </span>
