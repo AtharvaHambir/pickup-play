@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { University } from '@/hooks/useUniversity';
 import { MapPin, Clock, Users, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
+import { isTeamSport, divideIntoTeams } from '@/utils/teamDivision';
 
 interface Game {
   id: string;
@@ -39,24 +40,61 @@ const GameDetailsDialog: React.FC<GameDetailsDialogProps> = ({ game, open, onOpe
   const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
 
-  const { data: participants } = useQuery({
+  const { data: participants, isLoading: participantsLoading, error: participantsError } = useQuery({
     queryKey: ['gameParticipants', game?.id],
     queryFn: async () => {
       if (!game?.id) return [];
       
+      console.log('Fetching participants for game:', game.id);
+      
       const { data, error } = await supabase
         .from('participants')
         .select(`
-          *,
-          user:users(full_name, email)
+          id,
+          user_id,
+          status,
+          joined_at
         `)
         .eq('game_id', game.id)
         .eq('status', 'joined');
 
-      if (error) throw error;
-      return data;
+      if (error) {
+        console.error('Error fetching participants:', error);
+        throw error;
+      }
+
+      console.log('Raw participants data:', data);
+
+      // Get user details for each participant
+      if (data && data.length > 0) {
+        const userIds = data.map(p => p.user_id);
+        const { data: users, error: usersError } = await supabase
+          .from('users')
+          .select('id, full_name, email')
+          .in('id', userIds);
+
+        if (usersError) {
+          console.error('Error fetching user details:', usersError);
+          throw usersError;
+        }
+
+        console.log('Users data:', users);
+
+        // Combine participant and user data
+        const participantsWithUsers = data.map(participant => ({
+          ...participant,
+          user: users?.find(u => u.id === participant.user_id) || { full_name: 'Unknown', email: '' }
+        }));
+
+        console.log('Final participants with users:', participantsWithUsers);
+        return participantsWithUsers;
+      }
+
+      return [];
     },
-    enabled: !!game?.id && open
+    enabled: !!game?.id && open,
+    retry: 3,
+    retryDelay: 1000
   });
 
   const isParticipant = game?.participants.some(p => p.user_id === user?.id && p.status === 'joined');
@@ -104,6 +142,7 @@ const GameDetailsDialog: React.FC<GameDetailsDialogProps> = ({ game, open, onOpe
       queryClient.invalidateQueries({ queryKey: ['games'] });
       queryClient.invalidateQueries({ queryKey: ['gameParticipants'] });
     } catch (error: any) {
+      console.error('Error joining/leaving game:', error);
       toast({
         title: "Error",
         description: error.message,
@@ -116,9 +155,13 @@ const GameDetailsDialog: React.FC<GameDetailsDialogProps> = ({ game, open, onOpe
 
   if (!game) return null;
 
+  // Check if we should show team division
+  const shouldShowTeams = isTeamSport(game.sport) && participants && participants.length >= 2;
+  const teams = shouldShowTeams ? divideIntoTeams(participants) : null;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle className="text-xl">{game.title}</DialogTitle>
@@ -162,32 +205,98 @@ const GameDetailsDialog: React.FC<GameDetailsDialogProps> = ({ game, open, onOpe
             </div>
           )}
 
-          {/* Participants */}
-          <div>
-            <h4 className="font-medium mb-3">
-              Participants ({participants?.length || 0})
-            </h4>
-            <div className="space-y-2 max-h-40 overflow-y-auto">
-              {participants?.map((participant) => (
-                <div key={participant.id} className="flex items-center space-x-3">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="text-xs">
-                      {participant.user.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="text-sm font-medium">{participant.user.full_name || 'Anonymous'}</p>
-                    {participant.user_id === game.created_by && (
-                      <Badge variant="outline" className="text-xs">Creator</Badge>
-                    )}
+          {/* Error handling */}
+          {participantsError && (
+            <div className="bg-red-50 border border-red-200 rounded-md p-3">
+              <p className="text-red-700 text-sm">
+                Error loading participants. Please try again.
+              </p>
+            </div>
+          )}
+
+          {/* Loading state */}
+          {participantsLoading && (
+            <div className="flex items-center justify-center py-4">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+            </div>
+          )}
+
+          {/* Team Division for Team Sports */}
+          {shouldShowTeams && teams && (
+            <div>
+              <h4 className="font-medium mb-3">Team Division</h4>
+              <div className="grid grid-cols-2 gap-4">
+                {/* Team A */}
+                <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+                  <h5 className="font-medium text-blue-800 mb-2">Team A ({teams.teamA.length})</h5>
+                  <div className="space-y-2">
+                    {teams.teamA.map((participant) => (
+                      <div key={participant.id} className="flex items-center space-x-2">
+                        <Avatar className="h-6 w-6">
+                          <AvatarFallback className="text-xs">
+                            {participant.user.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm">{participant.user.full_name || 'Anonymous'}</span>
+                        {participant.user_id === game.created_by && (
+                          <Badge variant="outline" className="text-xs">Creator</Badge>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </div>
-              ))}
-              {(!participants || participants.length === 0) && (
-                <p className="text-gray-500 text-sm">No participants yet</p>
-              )}
+
+                {/* Team B */}
+                <div className="bg-green-50 border border-green-200 rounded-md p-3">
+                  <h5 className="font-medium text-green-800 mb-2">Team B ({teams.teamB.length})</h5>
+                  <div className="space-y-2">
+                    {teams.teamB.map((participant) => (
+                      <div key={participant.id} className="flex items-center space-x-2">
+                        <Avatar className="h-6 w-6">
+                          <AvatarFallback className="text-xs">
+                            {participant.user.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm">{participant.user.full_name || 'Anonymous'}</span>
+                        {participant.user_id === game.created_by && (
+                          <Badge variant="outline" className="text-xs">Creator</Badge>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* All Participants (for non-team sports or when less than 2 players) */}
+          {(!shouldShowTeams || !teams) && (
+            <div>
+              <h4 className="font-medium mb-3">
+                Participants ({participants?.length || 0})
+              </h4>
+              <div className="space-y-2 max-h-40 overflow-y-auto">
+                {participants?.map((participant) => (
+                  <div key={participant.id} className="flex items-center space-x-3">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="text-xs">
+                        {participant.user.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="text-sm font-medium">{participant.user.full_name || 'Anonymous'}</p>
+                      {participant.user_id === game.created_by && (
+                        <Badge variant="outline" className="text-xs">Creator</Badge>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                {(!participants || participants.length === 0) && !participantsLoading && (
+                  <p className="text-gray-500 text-sm">No participants yet</p>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Action Buttons */}
           <div className="flex gap-3 pt-4">

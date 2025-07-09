@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,6 +10,7 @@ import { Plus, LogOut, MapPin, Clock, Users, Calendar } from 'lucide-react';
 import CreateGameDialog from '@/components/CreateGameDialog';
 import GameDetailsDialog from '@/components/GameDetailsDialog';
 import { format } from 'date-fns';
+import { getUniversityAbbreviation } from '@/utils/universityAbbreviations';
 
 interface Game {
   id: string;
@@ -75,6 +75,8 @@ const UniversityDashboard = () => {
     );
   }
 
+  const universityAbbreviation = getUniversityAbbreviation(university.domain);
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -86,7 +88,7 @@ const UniversityDashboard = () => {
                 className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold"
                 style={{ backgroundColor: university.primary_color }}
               >
-                {university.short_name.substring(0, 2).toUpperCase()}
+                {universityAbbreviation}
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">PickupPlay</h1>
