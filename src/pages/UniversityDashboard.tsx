@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,9 +7,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUniversity } from '@/hooks/useUniversity';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, LogOut, MapPin, Clock, Users, Calendar } from 'lucide-react';
+import { Plus, LogOut, MapPin, Clock, Users, Calendar, Basketball, Search } from 'lucide-react';
 import CreateGameDialog from '@/components/CreateGameDialog';
 import GameDetailsDialog from '@/components/GameDetailsDialog';
+import BottomNavigation from '@/components/BottomNavigation';
 import { format } from 'date-fns';
 import { getUniversityAbbreviation } from '@/utils/universityAbbreviations';
 
@@ -56,14 +58,14 @@ const UniversityDashboard = () => {
 
   if (!university) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle className="text-center text-red-600">Unsupported University</CardTitle>
+            <CardTitle className="text-center text-destructive">Unsupported University</CardTitle>
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p>Sorry, your university email domain is not supported yet.</p>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-muted-foreground">
               Contact us to add support for your university!
             </p>
             <Button onClick={signOut} variant="outline">
@@ -78,134 +80,115 @@ const UniversityDashboard = () => {
   const universityAbbreviation = getUniversityAbbreviation(university.domain);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-6xl mx-auto px-4 py-4">
+    <div className="min-h-screen bg-background pb-20">
+      {/* Header with gradient */}
+      <header className="gradient-bg text-white">
+        <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div 
-                className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold"
-                style={{ backgroundColor: university.primary_color }}
-              >
-                {universityAbbreviation}
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">PickupPlay</h1>
-                <p className="text-sm text-gray-600">{university.name}</p>
-              </div>
+            <div>
+              <h1 className="text-3xl font-bold">PickupPlay</h1>
+              <p className="text-white/80">{university.name}</p>
             </div>
-            
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">
-                {userProfile?.full_name}
-              </span>
-              <Button onClick={signOut} variant="outline" size="sm">
-                <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
-              </Button>
+            <div className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
+              3
             </div>
           </div>
         </div>
       </header>
 
       <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome back!
-          </h2>
-          <p className="text-gray-600">
-            Find and join pickup games at {university.name}
-          </p>
-        </div>
+        {/* Action Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <Card 
+            className="bg-gradient-to-br from-orange-400 to-orange-500 text-white cursor-pointer hover:shadow-lg transition-shadow"
+            onClick={() => setCreateGameOpen(true)}
+          >
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-3">
+                <Basketball className="h-8 w-8" />
+                <div>
+                  <h3 className="text-xl font-bold">Create Game</h3>
+                  <p className="text-white/80">Start a new pickup game</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-blue-600 mb-2">
-                {games?.length || 0}
+          <Card className="bg-gradient-to-br from-purple-400 to-purple-500 text-white cursor-pointer hover:shadow-lg transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-3">
+                <Calendar className="h-8 w-8" />
+                <div>
+                  <h3 className="text-xl font-bold">My Games</h3>
+                  <p className="text-white/80">View upcoming games</p>
+                </div>
               </div>
-              <div className="text-gray-600">Upcoming Games</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-green-600 mb-2">
-                {games?.reduce((sum, game) => sum + game.participants.filter(p => p.status === 'joined').length, 0) || 0}
-              </div>
-              <div className="text-gray-600">Total Players</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-purple-600 mb-2">
-                {new Set(games?.map(game => game.sport)).size || 0}
-              </div>
-              <div className="text-gray-600">Sports Available</div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Games Section */}
+        {/* Available Games Section */}
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-2xl font-bold text-gray-900">Upcoming Games</h3>
-          <Button onClick={() => setCreateGameOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Create Game
+          <h3 className="text-2xl font-bold text-foreground">Available Games</h3>
+          <Button variant="outline" size="sm">
+            <Search className="h-4 w-4 mr-2" />
+            Filter
           </Button>
         </div>
 
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           </div>
         ) : games && games.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="space-y-4">
             {games.map((game) => (
-              <Card key={game.id} className="hover:shadow-lg transition-shadow cursor-pointer">
-                <CardHeader onClick={() => setSelectedGame(game)}>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">{game.title}</CardTitle>
-                    <Badge variant="secondary">{game.sport}</Badge>
-                  </div>
-                </CardHeader>
-                <CardContent onClick={() => setSelectedGame(game)} className="space-y-3">
-                  <div className="flex items-center text-gray-600">
-                    <MapPin className="h-4 w-4 mr-2" />
-                    <span className="text-sm">{game.location}</span>
-                  </div>
-                  
-                  <div className="flex items-center text-gray-600">
-                    <Calendar className="h-4 w-4 mr-2" />
-                    <span className="text-sm">
-                      {format(new Date(game.date_time), 'MMM d, yyyy')}
-                    </span>
-                  </div>
-                  
-                  <div className="flex items-center text-gray-600">
-                    <Clock className="h-4 w-4 mr-2" />
-                    <span className="text-sm">
-                      {format(new Date(game.date_time), 'h:mm a')} • {game.duration}min
-                    </span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center text-gray-600">
-                      <Users className="h-4 w-4 mr-2" />
-                      <span className="text-sm">
-                        {game.participants.filter(p => p.status === 'joined').length}/{game.max_participants}
-                      </span>
+              <Card 
+                key={game.id} 
+                className="hover:shadow-md transition-shadow cursor-pointer border-l-4 border-l-primary"
+                onClick={() => setSelectedGame(game)}
+              >
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-3 mb-2">
+                        <div className="text-2xl">🏀</div>
+                        <div>
+                          <h4 className="text-lg font-semibold text-foreground">{game.sport}</h4>
+                          <div className="flex items-center text-sm text-muted-foreground">
+                            <span className="bg-accent/20 text-accent-foreground px-2 py-1 rounded text-xs">
+                              {game.participants.filter(p => p.status === 'joined').length}/{game.max_participants} players
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div className="flex items-center text-muted-foreground">
+                          <MapPin className="h-4 w-4 mr-2" />
+                          <span className="text-sm">{game.location}</span>
+                        </div>
+                        
+                        <div className="flex items-center text-muted-foreground">
+                          <Clock className="h-4 w-4 mr-2" />
+                          <span className="text-sm">
+                            {format(new Date(game.date_time), 'MMM d')} • {format(new Date(game.date_time), 'h:mm a')}
+                          </span>
+                        </div>
+                      </div>
+
+                      {game.description && (
+                        <p className="text-sm text-muted-foreground mt-3 line-clamp-2">
+                          {game.description}
+                        </p>
+                      )}
                     </div>
-                    <div className="w-20 bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-blue-600 h-2 rounded-full"
-                        style={{ 
-                          width: `${Math.min(100, (game.participants.filter(p => p.status === 'joined').length / game.max_participants) * 100)}%` 
-                        }}
-                      />
-                    </div>
+
+                    {game.participants.filter(p => p.status === 'joined').length >= game.max_participants ? (
+                      <Badge variant="destructive" className="ml-4">Full</Badge>
+                    ) : (
+                      <Button className="ml-4">Join Game</Button>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -214,7 +197,7 @@ const UniversityDashboard = () => {
         ) : (
           <Card className="text-center py-12">
             <CardContent>
-              <div className="text-gray-500 text-lg mb-4">
+              <div className="text-muted-foreground text-lg mb-4">
                 No upcoming games yet
               </div>
               <Button onClick={() => setCreateGameOpen(true)}>
@@ -238,6 +221,8 @@ const UniversityDashboard = () => {
         onOpenChange={(open) => !open && setSelectedGame(null)}
         university={university}
       />
+
+      <BottomNavigation />
     </div>
   );
 };

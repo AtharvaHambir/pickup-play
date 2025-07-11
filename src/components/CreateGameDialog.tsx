@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,7 +31,8 @@ const CreateGameDialog: React.FC<CreateGameDialogProps> = ({ open, onOpenChange,
     time: '',
     duration: '60',
     maxParticipants: '10',
-    description: ''
+    description: '',
+    autoDivideTeams: 'yes'
   });
 
   const sports = [
@@ -87,7 +87,8 @@ const CreateGameDialog: React.FC<CreateGameDialogProps> = ({ open, onOpenChange,
         time: '',
         duration: '60',
         maxParticipants: '10',
-        description: ''
+        description: '',
+        autoDivideTeams: 'yes'
       });
 
       onOpenChange(false);
@@ -112,21 +113,10 @@ const CreateGameDialog: React.FC<CreateGameDialogProps> = ({ open, onOpenChange,
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="title">Game Title</Label>
-            <Input
-              id="title"
-              value={formData.title}
-              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-              placeholder="e.g., Pickup Basketball"
-              required
-            />
-          </div>
-
-          <div>
             <Label htmlFor="sport">Sport</Label>
             <Select value={formData.sport} onValueChange={(value) => setFormData(prev => ({ ...prev, sport: value }))}>
               <SelectTrigger>
-                <SelectValue placeholder="Select a sport" />
+                <SelectValue placeholder="Basketball" />
               </SelectTrigger>
               <SelectContent>
                 {sports.map((sport) => (
@@ -137,10 +127,29 @@ const CreateGameDialog: React.FC<CreateGameDialogProps> = ({ open, onOpenChange,
           </div>
 
           <div>
+            <Label htmlFor="datetime">Date & Time</Label>
+            <div className="grid grid-cols-2 gap-2">
+              <Input
+                type="date"
+                value={formData.date}
+                onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
+                min={new Date().toISOString().split('T')[0]}
+                required
+              />
+              <Input
+                type="time"
+                value={formData.time}
+                onChange={(e) => setFormData(prev => ({ ...prev, time: e.target.value }))}
+                required
+              />
+            </div>
+          </div>
+
+          <div>
             <Label htmlFor="location">Location</Label>
             <Select value={formData.location} onValueChange={(value) => setFormData(prev => ({ ...prev, location: value }))}>
               <SelectTrigger>
-                <SelectValue placeholder="Select location" />
+                <SelectValue placeholder="Gym Court A" />
               </SelectTrigger>
               <SelectContent>
                 {locations.map((location) => (
@@ -150,76 +159,53 @@ const CreateGameDialog: React.FC<CreateGameDialogProps> = ({ open, onOpenChange,
             </Select>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="date">Date</Label>
-              <Input
-                id="date"
-                type="date"
-                value={formData.date}
-                onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
-                min={new Date().toISOString().split('T')[0]}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="time">Time</Label>
-              <Input
-                id="time"
-                type="time"
-                value={formData.time}
-                onChange={(e) => setFormData(prev => ({ ...prev, time: e.target.value }))}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="duration">Duration (minutes)</Label>
-              <Input
-                id="duration"
-                type="number"
-                value={formData.duration}
-                onChange={(e) => setFormData(prev => ({ ...prev, duration: e.target.value }))}
-                min="15"
-                max="300"
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="maxParticipants">Max Players</Label>
-              <Input
-                id="maxParticipants"
-                type="number"
-                value={formData.maxParticipants}
-                onChange={(e) => setFormData(prev => ({ ...prev, maxParticipants: e.target.value }))}
-                min="2"
-                max="50"
-                required
-              />
-            </div>
+          <div>
+            <Label htmlFor="maxParticipants">Max Players</Label>
+            <Input
+              id="maxParticipants"
+              type="number"
+              value={formData.maxParticipants}
+              onChange={(e) => setFormData(prev => ({ ...prev, maxParticipants: e.target.value }))}
+              min="2"
+              max="50"
+              required
+            />
           </div>
 
           <div>
-            <Label htmlFor="description">Description (Optional)</Label>
+            <Label htmlFor="description">Game Description</Label>
             <Textarea
               id="description"
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              placeholder="Any additional details about the game..."
+              placeholder="Casual pickup game, all skill levels welcome!"
               rows={3}
             />
           </div>
 
-          <div className="flex gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
-              Cancel
-            </Button>
-            <Button type="submit" disabled={loading} className="flex-1">
-              {loading ? 'Creating...' : 'Create Game'}
-            </Button>
+          <div>
+            <Label htmlFor="autoDivideTeams">Auto-divide teams?</Label>
+            <Select 
+              value={formData.autoDivideTeams} 
+              onValueChange={(value) => setFormData(prev => ({ ...prev, autoDivideTeams: value }))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Yes, automatically" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="yes">Yes, automatically</SelectItem>
+                <SelectItem value="no">No, manual selection</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
+
+          <Button 
+            type="submit" 
+            disabled={loading} 
+            className="w-full bg-primary hover:bg-primary/90"
+          >
+            {loading ? 'Creating...' : 'Create Game & Send Invites'}
+          </Button>
         </form>
       </DialogContent>
     </Dialog>

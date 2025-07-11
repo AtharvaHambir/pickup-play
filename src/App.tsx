@@ -7,6 +7,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import UniversityDashboard from "@/pages/UniversityDashboard";
+import Calendar from "@/pages/Calendar";
+import Competitions from "@/pages/Competitions";
+import Profile from "@/pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +25,26 @@ const App = () => (
             <Route path="/" element={
               <ProtectedRoute>
                 <UniversityDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/calendar" element={
+              <ProtectedRoute>
+                <Calendar />
+              </ProtectedRoute>
+            } />
+            <Route path="/create" element={
+              <ProtectedRoute>
+                <UniversityDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/compete" element={
+              <ProtectedRoute>
+                <Competitions />
+              </ProtectedRoute>
+            } />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <Profile />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
