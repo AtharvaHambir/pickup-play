@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUniversity } from '@/hooks/useUniversity';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, LogOut, MapPin, Clock, Users, Calendar, Basketball, Search } from 'lucide-react';
+import { Plus, LogOut, MapPin, Clock, Users, Calendar, Trophy, Search } from 'lucide-react';
 import CreateGameDialog from '@/components/CreateGameDialog';
 import GameDetailsDialog from '@/components/GameDetailsDialog';
 import BottomNavigation from '@/components/BottomNavigation';
@@ -105,7 +105,7 @@ const UniversityDashboard = () => {
           >
             <CardContent className="p-6">
               <div className="flex items-center space-x-3">
-                <Basketball className="h-8 w-8" />
+                <Trophy className="h-8 w-8" />
                 <div>
                   <h3 className="text-xl font-bold">Create Game</h3>
                   <p className="text-white/80">Start a new pickup game</p>

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar as CalendarIcon, Check, Bell, Sync } from 'lucide-react';
+import { Calendar as CalendarIcon, Check, Bell, RefreshCw } from 'lucide-react';
 import BottomNavigation from '@/components/BottomNavigation';
 
 const Calendar = () => {
