@@ -63,13 +63,22 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				northeastern: {
-					red: '#C8102E',
-					'red-dark': '#A00D26',
-					'red-light': '#E6394A',
-					gray: '#58595B',
-					'gray-light': '#F5F5F5',
-					black: '#000000'
+				// Custom color palette
+				charcoal: {
+					DEFAULT: '51 51 51', /* Dark Charcoal / Near-Black */
+					light: '75 85 99'
+				},
+				navy: {
+					DEFAULT: '31 41 55', /* Deep Navy-Black */
+					dark: '17 24 39'
+				},
+				green: {
+					muted: '104 142 103', /* Muted Green Accent */
+					light: '134 172 133'
+				},
+				gray: {
+					soft: '107 114 128', /* Soft Gray */
+					'off-white': '248 249 250' /* Off-White / Very Light Gray */
 				}
 			},
 			borderRadius: {
