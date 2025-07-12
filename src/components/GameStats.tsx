@@ -6,7 +6,7 @@ import { Trophy, Target, Users, Calendar } from 'lucide-react';
 interface GameStatsProps {
   totalGames: number;
   gamesWon: number;
-  favoriteSpor t: string;
+  favoriteSport: string;
   upcomingGames: number;
 }
 
