@@ -1,222 +1,244 @@
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Plus, MapPin, Clock, Users, Search, Filter } from "lucide-react";
-import GameCard from "@/components/GameCard";
-import CreateGameModal from "@/components/CreateGameModal";
-import Header from "@/components/Header";
-import SportCategories from "@/components/SportCategories";
-
-const mockGames = [
-  {
-    id: 1,
-    sport: "Basketball",
-    title: "Pickup Basketball @ Cabot Gym",
-    location: "Cabot Physical Education Center",
-    time: "2:00 PM",
-    duration: "1 hour",
-    currentPlayers: 6,
-    maxPlayers: 10,
-    skillLevel: "Intermediate",
-    description: "Casual pickup game. All skill levels welcome!",
-    creator: "Mike Chen",
-    createdTime: "30 min ago"
-  },
-  {
-    id: 2,
-    sport: "Soccer",
-    title: "Soccer Match @ Parsons Field",
-    location: "Parsons Field",
-    time: "4:30 PM", 
-    duration: "90 minutes",
-    currentPlayers: 14,
-    maxPlayers: 22,
-    skillLevel: "All Levels",
-    description: "Need players for a friendly match. Bring water!",
-    creator: "Sarah Kim",
-    createdTime: "1 hour ago"
-  },
-  {
-    id: 3,
-    sport: "Tennis",
-    title: "Tennis Doubles @ Marino Center",
-    location: "Marino Recreation Center",
-    time: "6:00 PM",
-    duration: "2 hours", 
-    currentPlayers: 2,
-    maxPlayers: 4,
-    skillLevel: "Advanced",
-    description: "Looking for experienced players for competitive doubles.",
-    creator: "Alex Johnson",
-    createdTime: "45 min ago"
-  },
-  {
-    id: 4,
-    sport: "Volleyball",
-    title: "Beach Volleyball",
-    location: "Volleyball Courts",
-    time: "3:15 PM",
-    duration: "1.5 hours",
-    currentPlayers: 4,
-    maxPlayers: 8,
-    skillLevel: "Beginner",
-    description: "Perfect for beginners! Come learn and have fun.",
-    creator: "Emma Davis",
-    createdTime: "2 hours ago"
-  }
-];
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { MapPin, Clock, Users, Calendar, Plus, Filter } from 'lucide-react';
+import { format } from 'date-fns';
 
 const Index = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedSport, setSelectedSport] = useState("All");
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [games, setGames] = useState(mockGames);
+  // Mock data for demonstration
+  const mockGames = [
+    {
+      id: "1",
+      title: "Basketball Game",
+      sport: "Basketball",
+      location: "Main Gym Court A",
+      date_time: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days from now
+      duration: 90,
+      max_participants: 10,
+      description: "Competitive basketball game for intermediate players",
+      participants: [
+        { user_id: "user1", status: "joined" },
+        { user_id: "user2", status: "joined" },
+        { user_id: "user3", status: "joined" }
+      ],
+      creator: { full_name: "John Smith" }
+    },
+    {
+      id: "2", 
+      title: "Soccer Match",
+      sport: "Soccer",
+      location: "Soccer Field 1",
+      date_time: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days from now
+      duration: 120,
+      max_participants: 22,
+      description: "Friendly soccer match, all skill levels welcome",
+      participants: [
+        { user_id: "user1", status: "joined" },
+        { user_id: "user2", status: "joined" },
+        { user_id: "user3", status: "joined" },
+        { user_id: "user4", status: "joined" },
+        { user_id: "user5", status: "joined" }
+      ],
+      creator: { full_name: "Sarah Johnson" }
+    },
+    {
+      id: "3",
+      title: "Tennis Doubles",
+      sport: "Tennis", 
+      location: "Tennis Court 2",
+      date_time: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 day from now
+      duration: 60,
+      max_participants: 4,
+      description: "Looking for doubles partners for a fun tennis match",
+      participants: [
+        { user_id: "user1", status: "joined" },
+        { user_id: "user2", status: "joined" }
+      ],
+      creator: { full_name: "Mike Davis" }
+    }
+  ];
 
-  const filteredGames = games.filter(game => {
-    const matchesSearch = game.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         game.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         game.sport.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesSport = selectedSport === "All" || game.sport === selectedSport;
-    return matchesSearch && matchesSport;
-  });
-
-  const handleCreateGame = (gameData: any) => {
-    const newGame = {
-      id: games.length + 1,
-      ...gameData,
-      currentPlayers: 1,
-      creator: "You",
-      createdTime: "Just now"
+  const getSportEmoji = (sport: string) => {
+    const sportEmojis: { [key: string]: string } = {
+      'Basketball': '🏀',
+      'Soccer': '⚽',
+      'Tennis': '🎾',
+      'Volleyball': '🏐',
+      'Football': '🏈',
+      'Baseball': '⚾'
     };
-    setGames([newGame, ...games]);
+    return sportEmojis[sport] || '🏃';
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-northeastern-gray-light via-white to-northeastern-gray-light">
-      <Header />
-      
+    <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="gradient-bg text-white py-16 px-4">
-        <div className="max-w-6xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-slide-up">
-            Find Your Game
-          </h1>
-          <p className="text-xl md:text-2xl mb-8 opacity-90 animate-slide-up">
-            Join pickup sports at Northeastern University
+      <section className="gradient-bg text-white">
+        <div className="max-w-6xl mx-auto px-4 py-20 text-center">
+          <h1 className="text-5xl font-bold mb-6">PickupPlay</h1>
+          <p className="text-xl mb-8 text-white/90 max-w-2xl mx-auto">
+            Connect with fellow university students for pickup games, sports, and activities. 
+            Book fields, create teams, and never miss a game.
           </p>
-          <Button 
-            onClick={() => setIsCreateModalOpen(true)}
-            size="lg" 
-            className="bg-white text-northeastern-red hover:bg-gray-100 text-lg px-8 py-6 animate-slide-up"
-          >
-            <Plus className="mr-2 h-6 w-6" />
-            Create Game
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" className="bg-white text-primary hover:bg-white/90 text-lg px-8">
+              Get Started
+            </Button>
+            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 text-lg px-8">
+              Learn More
+            </Button>
+          </div>
         </div>
       </section>
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Search and Filter Section */}
-        <div className="mb-8 animate-fade-in">
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-              <Input
-                placeholder="Search games, locations, or sports..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 h-12 text-lg"
-              />
-            </div>
-            <Button variant="outline" size="lg" className="h-12">
-              <Filter className="mr-2 h-5 w-5" />
-              Filter
-            </Button>
+      {/* Features Section */}
+      <section className="py-20 bg-background">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-foreground mb-4">Everything You Need</h2>
+            <p className="text-xl text-muted-foreground">
+              From game creation to team management, we've got you covered
+            </p>
           </div>
 
-          <SportCategories 
-            selectedSport={selectedSport}
-            onSportSelect={setSelectedSport}
-          />
-        </div>
-
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 animate-fade-in">
-          <Card className="glass-effect border-0 text-center">
-            <CardContent className="p-6">
-              <div className="text-3xl font-bold text-northeastern-red mb-2">
-                {games.length}
-              </div>
-              <div className="text-gray-600">Active Games</div>
-            </CardContent>
-          </Card>
-          <Card className="glass-effect border-0 text-center">
-            <CardContent className="p-6">
-              <div className="text-3xl font-bold text-northeastern-red mb-2">
-                {games.reduce((sum, game) => sum + game.currentPlayers, 0)}
-              </div>
-              <div className="text-gray-600">Players Online</div>
-            </CardContent>
-          </Card>
-          <Card className="glass-effect border-0 text-center">
-            <CardContent className="p-6">
-              <div className="text-3xl font-bold text-northeastern-red mb-2">
-                8
-              </div>
-              <div className="text-gray-600">Sports Available</div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Games List */}
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-3xl font-bold text-gray-900">
-              Available Games
-            </h2>
-            <Badge variant="secondary" className="text-lg px-4 py-2">
-              {filteredGames.length} games
-            </Badge>
-          </div>
-
-          {filteredGames.length === 0 ? (
-            <Card className="text-center py-12">
-              <CardContent>
-                <div className="text-gray-500 text-lg mb-4">
-                  No games found matching your criteria
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card className="text-center">
+              <CardHeader>
+                <div className="mx-auto bg-primary/10 rounded-full p-3 w-16 h-16 flex items-center justify-center mb-4">
+                  <Plus className="h-8 w-8 text-primary" />
                 </div>
-                <Button 
-                  onClick={() => setIsCreateModalOpen(true)}
-                  className="bg-northeastern-red hover:bg-northeastern-red-dark"
-                >
-                  <Plus className="mr-2 h-5 w-5" />
-                  Create the First Game
-                </Button>
+                <CardTitle>Create Games</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Easily create pickup games for any sport. Set the time, location, and invite others to join.
+                </p>
               </CardContent>
             </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {filteredGames.map((game, index) => (
-                <GameCard 
-                  key={game.id} 
-                  game={game} 
-                  className={`animate-slide-up`}
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
 
-      <CreateGameModal 
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        onCreateGame={handleCreateGame}
-      />
+            <Card className="text-center">
+              <CardHeader>
+                <div className="mx-auto bg-primary/10 rounded-full p-3 w-16 h-16 flex items-center justify-center mb-4">
+                  <Users className="h-8 w-8 text-primary" />
+                </div>
+                <CardTitle>Join Teams</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Find and join games in your area. Connect with students who share your passion for sports.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center">
+              <CardHeader>
+                <div className="mx-auto bg-primary/10 rounded-full p-3 w-16 h-16 flex items-center justify-center mb-4">
+                  <Calendar className="h-8 w-8 text-primary" />
+                </div>
+                <CardTitle>Stay Organized</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Keep track of your games with our built-in calendar and never miss an important match.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Games Preview Section */}
+      <section className="py-20 bg-muted/50">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-foreground mb-4">Upcoming Games</h2>
+            <p className="text-xl text-muted-foreground">
+              Join these exciting games happening soon
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            {mockGames.map((game) => (
+              <Card key={game.id} className="hover:shadow-lg transition-all duration-200 border-l-4 border-l-primary">
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-3 mb-3">
+                        <span className="text-2xl">{getSportEmoji(game.sport)}</span>
+                        <div>
+                          <h4 className="text-lg font-semibold text-foreground">{game.sport}</h4>
+                          <Badge variant="secondary" className="text-xs">
+                            {game.participants.length}/{game.max_participants} players
+                          </Badge>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2 mb-3">
+                        <div className="flex items-center text-muted-foreground">
+                          <MapPin className="h-4 w-4 mr-2 text-primary" />
+                          <span className="text-sm">{game.location}</span>
+                        </div>
+                        
+                        <div className="flex items-center text-muted-foreground">
+                          <Clock className="h-4 w-4 mr-2 text-primary" />
+                          <span className="text-sm">
+                            {format(new Date(game.date_time), 'MMM d, yyyy')} • {format(new Date(game.date_time), 'h:mm a')}
+                          </span>
+                        </div>
+                        
+                        <div className="flex items-center text-muted-foreground">
+                          <Calendar className="h-4 w-4 mr-2 text-primary" />
+                          <span className="text-sm">{game.duration} minutes</span>
+                        </div>
+                      </div>
+
+                      {game.description && (
+                        <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                          {game.description}
+                        </p>
+                      )}
+                      
+                      <p className="text-xs text-muted-foreground">
+                        Created by {game.creator.full_name}
+                      </p>
+                    </div>
+
+                    <div className="ml-4 flex flex-col space-y-2">
+                      <Button className="text-sm bg-primary hover:bg-primary/90">
+                        Join Game
+                      </Button>
+                      <Button variant="outline" size="sm" className="text-xs">
+                        Details
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <Button size="lg" className="bg-primary hover:bg-primary/90">
+              View All Games
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 gradient-bg text-white">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-4xl font-bold mb-6">Ready to Play?</h2>
+          <p className="text-xl mb-8 text-white/90">
+            Join thousands of students already using PickupPlay to stay active and connected.
+          </p>
+          <Button size="lg" className="bg-white text-primary hover:bg-white/90 text-lg px-8">
+            Sign Up with University Email
+          </Button>
+        </div>
+      </section>
     </div>
   );
 };

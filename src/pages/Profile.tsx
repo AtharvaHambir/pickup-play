@@ -144,7 +144,7 @@ const Profile = () => {
                 </p>
                 <div className="flex items-center space-x-4">
                   <Badge variant="outline" className="px-3 py-1">
-                    Member since {format(new Date(userProfile?.created_at || new Date()), 'MMM yyyy')}
+                    Member since {format(new Date(), 'MMM yyyy')}
                   </Badge>
                   <Badge variant="secondary" className="px-3 py-1">
                     Favorite: {getSportEmoji(favoriteSport)} {favoriteSport}
