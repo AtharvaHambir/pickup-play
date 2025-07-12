@@ -1,122 +1,126 @@
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { MapPin, Clock, Users, Star } from "lucide-react";
-
-interface Game {
-  id: number;
-  sport: string;
-  title: string;
-  location: string;
-  time: string;
-  duration: string;
-  currentPlayers: number;
-  maxPlayers: number;
-  skillLevel: string;
-  description: string;
-  creator: string;
-  createdTime: string;
-}
+import React from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { MapPin, Clock, Users, Calendar } from 'lucide-react';
+import { format } from 'date-fns';
 
 interface GameCardProps {
-  game: Game;
-  className?: string;
-  style?: React.CSSProperties;
+  game: {
+    id: string;
+    title: string;
+    sport: string;
+    location: string;
+    date_time: string;
+    duration: number;
+    max_participants: number;
+    description: string | null;
+    participants: { user_id: string; status: string }[];
+    creator: { full_name: string | null };
+  };
+  onJoin: (gameId: string) => void;
+  onViewDetails: (game: any) => void;
 }
 
-const GameCard = ({ game, className = "", style }: GameCardProps) => {
+const GameCard: React.FC<GameCardProps> = ({ game, onJoin, onViewDetails }) => {
+  const currentParticipants = game.participants.filter(p => p.status === 'joined').length;
+  const isFull = currentParticipants >= game.max_participants;
+  
   const getSportEmoji = (sport: string) => {
     const sportEmojis: { [key: string]: string } = {
-      "Basketball": "🏀",
-      "Soccer": "⚽",
-      "Tennis": "🎾", 
-      "Volleyball": "🏐",
-      "Football": "🏈",
-      "Baseball": "⚾",
-      "Swimming": "🏊",
-      "Running": "🏃"
+      'Basketball': '🏀',
+      'Soccer': '⚽',
+      'Tennis': '🎾',
+      'Volleyball': '🏐',
+      'Football': '🏈',
+      'Baseball': '⚾',
+      'Softball': '🥎',
+      'Swimming': '🏊',
+      'Running': '🏃',
+      'Cycling': '🚴',
+      'Ultimate Frisbee': '🥏',
+      'Badminton': '🏸'
     };
-    return sportEmojis[sport] || "🏃";
+    return sportEmojis[sport] || '🏃';
   };
-
-  const getSkillColor = (level: string) => {
-    switch (level) {
-      case "Beginner": return "bg-green-100 text-green-800";
-      case "Intermediate": return "bg-yellow-100 text-yellow-800";
-      case "Advanced": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const playersFull = game.currentPlayers >= game.maxPlayers;
 
   return (
-    <Card className={`hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 ${className}`} style={style}>
-      <CardHeader className="pb-3">
+    <Card className="hover:shadow-lg transition-all duration-200 border-l-4 border-l-primary cursor-pointer">
+      <CardContent className="p-6">
         <div className="flex items-start justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="text-3xl">{getSportEmoji(game.sport)}</div>
-            <div>
-              <CardTitle className="text-xl text-gray-900">{game.title}</CardTitle>
-              <div className="flex items-center text-gray-600 mt-1">
-                <Avatar className="h-5 w-5 mr-2">
-                  <AvatarFallback className="text-xs bg-northeastern-red text-white">
-                    {game.creator.split(' ').map(n => n[0]).join('')}
-                  </AvatarFallback>
-                </Avatar>
-                <span className="text-sm">{game.creator} • {game.createdTime}</span>
+          <div className="flex-1" onClick={() => onViewDetails(game)}>
+            <div className="flex items-center space-x-3 mb-3">
+              <span className="text-2xl">{getSportEmoji(game.sport)}</span>
+              <div>
+                <h4 className="text-lg font-semibold text-foreground">{game.sport}</h4>
+                <Badge 
+                  variant={isFull ? "destructive" : "secondary"}
+                  className="text-xs"
+                >
+                  {currentParticipants}/{game.max_participants} players
+                </Badge>
               </div>
             </div>
-          </div>
-          <Badge className={getSkillColor(game.skillLevel)}>
-            {game.skillLevel}
-          </Badge>
-        </div>
-      </CardHeader>
-
-      <CardContent className="space-y-4">
-        <p className="text-gray-600">{game.description}</p>
-        
-        <div className="grid grid-cols-1 gap-3">
-          <div className="flex items-center text-gray-700">
-            <MapPin className="h-4 w-4 mr-2 text-northeastern-red" />
-            <span className="text-sm">{game.location}</span>
-          </div>
-          
-          <div className="flex items-center text-gray-700">
-            <Clock className="h-4 w-4 mr-2 text-northeastern-red" />
-            <span className="text-sm">{game.time} • {game.duration}</span>
-          </div>
-          
-          <div className="flex items-center text-gray-700">
-            <Users className="h-4 w-4 mr-2 text-northeastern-red" />
-            <span className="text-sm">
-              {game.currentPlayers}/{game.maxPlayers} players
-            </span>
-            <div className="ml-2 flex-1 bg-gray-200 rounded-full h-2">
-              <div 
-                className="bg-northeastern-red h-2 rounded-full transition-all duration-300"
-                style={{ width: `${(game.currentPlayers / game.maxPlayers) * 100}%` }}
-              />
+            
+            <div className="space-y-2 mb-3">
+              <div className="flex items-center text-muted-foreground">
+                <MapPin className="h-4 w-4 mr-2 text-primary" />
+                <span className="text-sm">{game.location}</span>
+              </div>
+              
+              <div className="flex items-center text-muted-foreground">
+                <Clock className="h-4 w-4 mr-2 text-primary" />
+                <span className="text-sm">
+                  {format(new Date(game.date_time), 'MMM d, yyyy')} • {format(new Date(game.date_time), 'h:mm a')}
+                </span>
+              </div>
+              
+              <div className="flex items-center text-muted-foreground">
+                <Calendar className="h-4 w-4 mr-2 text-primary" />
+                <span className="text-sm">{game.duration} minutes</span>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <div className="flex gap-2 pt-2">
-          {playersFull ? (
-            <Button variant="outline" disabled className="flex-1">
-              Game Full
+            {game.description && (
+              <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                {game.description}
+              </p>
+            )}
+            
+            <p className="text-xs text-muted-foreground">
+              Created by {game.creator.full_name || 'Anonymous'}
+            </p>
+          </div>
+
+          <div className="ml-4 flex flex-col space-y-2">
+            {isFull ? (
+              <Button variant="outline" disabled className="text-sm">
+                Full
+              </Button>
+            ) : (
+              <Button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onJoin(game.id);
+                }}
+                className="text-sm bg-primary hover:bg-primary/90"
+              >
+                Join Game
+              </Button>
+            )}
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                onViewDetails(game);
+              }}
+              className="text-xs"
+            >
+              Details
             </Button>
-          ) : (
-            <Button className="flex-1 bg-northeastern-red hover:bg-northeastern-red-dark">
-              Join Game
-            </Button>
-          )}
-          <Button variant="outline" size="icon">
-            <Star className="h-4 w-4" />
-          </Button>
+          </div>
         </div>
       </CardContent>
     </Card>

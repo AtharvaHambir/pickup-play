@@ -7,12 +7,15 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUniversity } from '@/hooks/useUniversity';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, LogOut, MapPin, Clock, Users, Calendar, Trophy, Search } from 'lucide-react';
+import { Plus, LogOut, Search, Filter } from 'lucide-react';
 import CreateGameDialog from '@/components/CreateGameDialog';
 import GameDetailsDialog from '@/components/GameDetailsDialog';
 import BottomNavigation from '@/components/BottomNavigation';
+import GameCard from '@/components/GameCard';
+import SportFilter from '@/components/SportFilter';
 import { format } from 'date-fns';
 import { getUniversityAbbreviation } from '@/utils/universityAbbreviations';
+import { useToast } from '@/hooks/use-toast';
 
 interface Game {
   id: string;
@@ -29,12 +32,15 @@ interface Game {
 }
 
 const UniversityDashboard = () => {
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const { university, userProfile } = useUniversity();
+  const { toast } = useToast();
   const [createGameOpen, setCreateGameOpen] = useState(false);
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
+  const [selectedSports, setSelectedSports] = useState<string[]>([]);
+  const [showFilters, setShowFilters] = useState(false);
 
-  const { data: games, isLoading } = useQuery({
+  const { data: games, isLoading, refetch } = useQuery({
     queryKey: ['games', university?.id],
     queryFn: async () => {
       if (!university?.id) return [];
@@ -55,6 +61,43 @@ const UniversityDashboard = () => {
     },
     enabled: !!university?.id
   });
+
+  const handleJoinGame = async (gameId: string) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('participants')
+        .insert({
+          game_id: gameId,
+          user_id: user.id,
+          status: 'joined'
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success!",
+        description: "You've joined the game successfully!"
+      });
+
+      refetch();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleSportToggle = (sport: string) => {
+    setSelectedSports(prev => 
+      prev.includes(sport) 
+        ? prev.filter(s => s !== sport)
+        : [...prev, sport]
+    );
+  };
 
   if (!university) {
     return (
@@ -77,6 +120,11 @@ const UniversityDashboard = () => {
     );
   }
 
+  const filteredGames = games?.filter(game => 
+    selectedSports.length === 0 || selectedSports.includes(game.sport)
+  ) || [];
+
+  const availableSports = [...new Set(games?.map(game => game.sport) || [])];
   const universityAbbreviation = getUniversityAbbreviation(university.domain);
 
   return (
@@ -89,15 +137,36 @@ const UniversityDashboard = () => {
               <h1 className="text-3xl font-bold">PickupPlay</h1>
               <p className="text-white/80">{university.name}</p>
             </div>
-            <div className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
-              3
+            <div className="flex items-center space-x-3">
+              <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+                {universityAbbreviation}
+              </Badge>
+              <Button
+                onClick={signOut}
+                variant="ghost"
+                size="sm"
+                className="text-white hover:bg-white/20"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign Out
+              </Button>
             </div>
           </div>
         </div>
       </header>
 
       <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Action Cards */}
+        {/* Welcome Section */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-foreground mb-2">
+            Welcome back, {userProfile?.full_name?.split(' ')[0] || 'Student'}! 👋
+          </h2>
+          <p className="text-muted-foreground">
+            Ready to play? Join a game or create your own pickup session.
+          </p>
+        </div>
+
+        {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <Card 
             className="bg-gradient-to-br from-orange-400 to-orange-500 text-white cursor-pointer hover:shadow-lg transition-shadow"
@@ -105,10 +174,12 @@ const UniversityDashboard = () => {
           >
             <CardContent className="p-6">
               <div className="flex items-center space-x-3">
-                <Trophy className="h-8 w-8" />
+                <div className="bg-white/20 rounded-full p-3">
+                  <Plus className="h-6 w-6" />
+                </div>
                 <div>
                   <h3 className="text-xl font-bold">Create Game</h3>
-                  <p className="text-white/80">Start a new pickup game</p>
+                  <p className="text-white/80">Start a new pickup session</p>
                 </div>
               </div>
             </CardContent>
@@ -117,96 +188,79 @@ const UniversityDashboard = () => {
           <Card className="bg-gradient-to-br from-purple-400 to-purple-500 text-white cursor-pointer hover:shadow-lg transition-shadow">
             <CardContent className="p-6">
               <div className="flex items-center space-x-3">
-                <Calendar className="h-8 w-8" />
+                <div className="bg-white/20 rounded-full p-3">
+                  <Search className="h-6 w-6" />
+                </div>
                 <div>
-                  <h3 className="text-xl font-bold">My Games</h3>
-                  <p className="text-white/80">View upcoming games</p>
+                  <h3 className="text-xl font-bold">Browse Games</h3>
+                  <p className="text-white/80">Find games to join</p>
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Available Games Section */}
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-2xl font-bold text-foreground">Available Games</h3>
-          <Button variant="outline" size="sm">
-            <Search className="h-4 w-4 mr-2" />
-            Filter
-          </Button>
+        {/* Games Section */}
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-2xl font-bold text-foreground">Available Games</h3>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setShowFilters(!showFilters)}
+            >
+              <Filter className="h-4 w-4 mr-2" />
+              Filters
+            </Button>
+          </div>
+
+          {showFilters && (
+            <Card className="p-4">
+              <SportFilter
+                selectedSports={selectedSports}
+                onSportToggle={handleSportToggle}
+                availableSports={availableSports}
+                gameCount={filteredGames.length}
+              />
+            </Card>
+          )}
+
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : filteredGames.length > 0 ? (
+            <div className="space-y-4">
+              {filteredGames.map((game) => (
+                <GameCard
+                  key={game.id}
+                  game={game}
+                  onJoin={handleJoinGame}
+                  onViewDetails={setSelectedGame}
+                />
+              ))}
+            </div>
+          ) : (
+            <Card className="text-center py-12">
+              <CardContent>
+                <div className="text-6xl mb-4">🏃‍♂️</div>
+                <div className="text-xl font-semibold text-foreground mb-2">
+                  {selectedSports.length > 0 ? 'No games found for selected sports' : 'No upcoming games yet'}
+                </div>
+                <p className="text-muted-foreground mb-6">
+                  {selectedSports.length > 0 
+                    ? 'Try adjusting your filters or create a new game' 
+                    : 'Be the first to create a pickup game for your university!'
+                  }
+                </p>
+                <Button onClick={() => setCreateGameOpen(true)} className="bg-primary hover:bg-primary/90">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create the First Game
+                </Button>
+              </CardContent>
+            </Card>
+          )}
         </div>
-
-        {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          </div>
-        ) : games && games.length > 0 ? (
-          <div className="space-y-4">
-            {games.map((game) => (
-              <Card 
-                key={game.id} 
-                className="hover:shadow-md transition-shadow cursor-pointer border-l-4 border-l-primary"
-                onClick={() => setSelectedGame(game)}
-              >
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <div className="text-2xl">🏀</div>
-                        <div>
-                          <h4 className="text-lg font-semibold text-foreground">{game.sport}</h4>
-                          <div className="flex items-center text-sm text-muted-foreground">
-                            <span className="bg-accent/20 text-accent-foreground px-2 py-1 rounded text-xs">
-                              {game.participants.filter(p => p.status === 'joined').length}/{game.max_participants} players
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <div className="flex items-center text-muted-foreground">
-                          <MapPin className="h-4 w-4 mr-2" />
-                          <span className="text-sm">{game.location}</span>
-                        </div>
-                        
-                        <div className="flex items-center text-muted-foreground">
-                          <Clock className="h-4 w-4 mr-2" />
-                          <span className="text-sm">
-                            {format(new Date(game.date_time), 'MMM d')} • {format(new Date(game.date_time), 'h:mm a')}
-                          </span>
-                        </div>
-                      </div>
-
-                      {game.description && (
-                        <p className="text-sm text-muted-foreground mt-3 line-clamp-2">
-                          {game.description}
-                        </p>
-                      )}
-                    </div>
-
-                    {game.participants.filter(p => p.status === 'joined').length >= game.max_participants ? (
-                      <Badge variant="destructive" className="ml-4">Full</Badge>
-                    ) : (
-                      <Button className="ml-4">Join Game</Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <Card className="text-center py-12">
-            <CardContent>
-              <div className="text-muted-foreground text-lg mb-4">
-                No upcoming games yet
-              </div>
-              <Button onClick={() => setCreateGameOpen(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Create the First Game
-              </Button>
-            </CardContent>
-          </Card>
-        )}
       </div>
 
       <CreateGameDialog 
