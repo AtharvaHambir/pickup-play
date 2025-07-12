@@ -23,29 +23,29 @@ const GameStats: React.FC<GameStatsProps> = ({
       title: 'Games Played',
       value: totalGames,
       icon: Calendar,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50'
+      color: 'text-primary',
+      bgColor: 'bg-primary/10'
     },
     {
       title: 'Games Won',
       value: gamesWon,
       icon: Trophy,
-      color: 'text-yellow-600',
-      bgColor: 'bg-yellow-50'
+      color: 'text-green-muted',
+      bgColor: 'bg-green-muted/10'
     },
     {
       title: 'Win Rate',
       value: `${winRate}%`,
       icon: Target,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50'
+      color: 'text-charcoal',
+      bgColor: 'bg-charcoal/10'
     },
     {
       title: 'Upcoming',
       value: upcomingGames,
       icon: Users,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50'
+      color: 'text-navy',
+      bgColor: 'bg-navy/10'
     }
   ];
 

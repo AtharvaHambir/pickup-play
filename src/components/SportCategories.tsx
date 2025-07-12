@@ -29,8 +29,8 @@ const SportCategories = ({ selectedSport, onSportSelect }: SportCategoriesProps)
           className={`
             h-12 px-4 transition-all duration-200
             ${selectedSport === sport.name 
-              ? "bg-northeastern-red hover:bg-northeastern-red-dark text-white" 
-              : "hover:bg-northeastern-red hover:text-white"
+              ? "bg-primary hover:bg-primary/90 text-primary-foreground" 
+              : "hover:bg-primary/10 hover:text-primary"
             }
           `}
         >
@@ -40,8 +40,8 @@ const SportCategories = ({ selectedSport, onSportSelect }: SportCategoriesProps)
             <span className={`
               ml-2 px-2 py-0.5 rounded-full text-xs
               ${selectedSport === sport.name 
-                ? "bg-white/20 text-white" 
-                : "bg-gray-100 text-gray-600"
+                ? "bg-primary-foreground/20 text-primary-foreground" 
+                : "bg-muted text-muted-foreground"
               }
             `}>
               {sport.count}
