@@ -12,42 +12,48 @@ const Competitions = () => {
       title: 'Inter-University Matches',
       description: 'Challenge students from other universities',
       icon: Target,
-      color: 'bg-red-50 text-red-600',
+      color: 'text-charcoal',
+      bgColor: 'bg-charcoal/10',
       comingSoon: true
     },
     {
       title: 'Tournament Brackets',
       description: 'Organized competitive tournaments',
       icon: Medal,
-      color: 'bg-blue-50 text-blue-600',
+      color: 'text-primary',
+      bgColor: 'bg-primary/10',
       comingSoon: true
     },
     {
       title: 'University Leaderboards',
       description: 'See how your university ranks',
       icon: BarChart3,
-      color: 'bg-purple-50 text-purple-600',
+      color: 'text-navy',
+      bgColor: 'bg-navy/10',
       comingSoon: true
     },
     {
       title: 'Team Championships',
       description: 'Form teams and compete for glory',
       icon: Users,
-      color: 'bg-green-50 text-green-600',
+      color: 'text-accent',
+      bgColor: 'bg-accent/10',
       comingSoon: true
     },
     {
       title: 'Seasonal Leagues',
       description: 'Long-term competitive seasons',
       icon: Calendar,
-      color: 'bg-orange-50 text-orange-600',
+      color: 'text-charcoal-light',
+      bgColor: 'bg-charcoal-light/10',
       comingSoon: true
     },
     {
       title: 'Special Events',
       description: 'Unique competitive challenges',
       icon: Sparkles,
-      color: 'bg-pink-50 text-pink-600',
+      color: 'text-green-muted',
+      bgColor: 'bg-green-muted/10',
       comingSoon: true
     }
   ];
@@ -73,7 +79,7 @@ const Competitions = () => {
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Hero Section */}
         <div className="text-center mb-12">
-          <div className="bg-gradient-to-br from-yellow-400 to-orange-500 text-white rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
+          <div className="bg-gradient-to-br from-primary to-accent text-white rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
             <Trophy className="h-12 w-12" />
           </div>
           <h2 className="text-4xl font-bold text-foreground mb-4">
@@ -88,10 +94,10 @@ const Competitions = () => {
         {/* Upcoming Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {upcomingFeatures.map((feature, index) => (
-            <Card key={index} className="hover:shadow-lg transition-shadow">
+            <Card key={index} className="hover:shadow-lg transition-shadow bg-card border-border">
               <CardContent className="p-6">
-                <div className={`${feature.color} rounded-full p-3 w-fit mb-4`}>
-                  <feature.icon className="h-6 w-6" />
+                <div className={`${feature.bgColor} rounded-full p-3 w-fit mb-4`}>
+                  <feature.icon className={`h-6 w-6 ${feature.color}`} />
                 </div>
                 <h3 className="text-xl font-semibold text-foreground mb-2">
                   {feature.title}
@@ -108,7 +114,7 @@ const Competitions = () => {
         </div>
 
         {/* Get Ready Section */}
-        <Card className="bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
+        <Card className="bg-gradient-to-br from-primary/10 to-accent/10 border-primary/20">
           <CardHeader>
             <CardTitle className="text-center text-2xl">
               🚀 Get Ready for Competition Mode!
@@ -120,19 +126,19 @@ const Competitions = () => {
             </p>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-white rounded-lg p-4 border">
+              <div className="bg-card rounded-lg p-4 border border-border">
                 <div className="text-2xl mb-2">🏃‍♂️</div>
                 <h4 className="font-semibold text-foreground mb-1">Stay Active</h4>
                 <p className="text-sm text-muted-foreground">Keep playing pickup games to build your stats</p>
               </div>
               
-              <div className="bg-white rounded-lg p-4 border">
+              <div className="bg-card rounded-lg p-4 border border-border">
                 <div className="text-2xl mb-2">👥</div>
                 <h4 className="font-semibold text-foreground mb-1">Build Teams</h4>
                 <p className="text-sm text-muted-foreground">Form connections with other players</p>
               </div>
               
-              <div className="bg-white rounded-lg p-4 border">
+              <div className="bg-card rounded-lg p-4 border border-border">
                 <div className="text-2xl mb-2">📈</div>
                 <h4 className="font-semibold text-foreground mb-1">Track Progress</h4>
                 <p className="text-sm text-muted-foreground">Monitor your game history and achievements</p>

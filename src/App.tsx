@@ -10,6 +10,7 @@ import UniversityDashboard from "@/pages/UniversityDashboard";
 import Calendar from "@/pages/Calendar";
 import Competitions from "@/pages/Competitions";
 import Profile from "@/pages/Profile";
+import Create from "@/pages/Create";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,7 +35,7 @@ const App = () => (
             } />
             <Route path="/create" element={
               <ProtectedRoute>
-                <UniversityDashboard />
+                <Create />
               </ProtectedRoute>
             } />
             <Route path="/compete" element={

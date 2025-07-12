@@ -81,7 +81,7 @@ const Calendar = () => {
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Calendar Widget */}
-          <Card>
+          <Card className="bg-card border-border">
             <CardHeader>
               <CardTitle className="flex items-center">
                 <CalendarIcon className="h-5 w-5 mr-2 text-primary" />
@@ -115,7 +115,7 @@ const Calendar = () => {
           </Card>
 
           {/* Games for Selected Date */}
-          <Card>
+          <Card className="bg-card border-border">
             <CardHeader>
               <CardTitle>
                 {selectedDate ? format(selectedDate, 'MMMM d, yyyy') : 'Select a date'}
@@ -168,14 +168,14 @@ const Calendar = () => {
         </div>
 
         {/* Booking Rules */}
-        <Card className="mt-8">
+        <Card className="mt-8 bg-muted/20 border-border">
           <CardHeader>
             <CardTitle>📋 Booking Guidelines</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="flex items-center space-x-3 p-4 bg-blue-50 rounded-lg">
-                <div className="bg-blue-500 text-white rounded-full p-2">
+              <div className="flex items-center space-x-3 p-4 bg-primary/10 rounded-lg">
+                <div className="bg-primary text-white rounded-full p-2">
                   <CalendarIcon className="h-4 w-4" />
                 </div>
                 <div>
@@ -184,8 +184,8 @@ const Calendar = () => {
                 </div>
               </div>
               
-              <div className="flex items-center space-x-3 p-4 bg-green-50 rounded-lg">
-                <div className="bg-green-500 text-white rounded-full p-2">
+              <div className="flex items-center space-x-3 p-4 bg-accent/10 rounded-lg">
+                <div className="bg-accent text-white rounded-full p-2">
                   <Users className="h-4 w-4" />
                 </div>
                 <div>
@@ -194,8 +194,8 @@ const Calendar = () => {
                 </div>
               </div>
               
-              <div className="flex items-center space-x-3 p-4 bg-purple-50 rounded-lg">
-                <div className="bg-purple-500 text-white rounded-full p-2">
+              <div className="flex items-center space-x-3 p-4 bg-navy/10 rounded-lg">
+                <div className="bg-navy text-white rounded-full p-2">
                   <Clock className="h-4 w-4" />
                 </div>
                 <div>

@@ -169,7 +169,7 @@ const UniversityDashboard = () => {
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <Card 
-            className="bg-gradient-to-br from-orange-400 to-orange-500 text-white cursor-pointer hover:shadow-lg transition-shadow"
+            className="bg-gradient-to-br from-primary to-accent text-white cursor-pointer hover:shadow-lg transition-shadow"
             onClick={() => setCreateGameOpen(true)}
           >
             <CardContent className="p-6">
@@ -185,7 +185,7 @@ const UniversityDashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-purple-400 to-purple-500 text-white cursor-pointer hover:shadow-lg transition-shadow">
+          <Card className="bg-gradient-to-br from-navy to-charcoal text-white cursor-pointer hover:shadow-lg transition-shadow">
             <CardContent className="p-6">
               <div className="flex items-center space-x-3">
                 <div className="bg-white/20 rounded-full p-3">
@@ -215,7 +215,7 @@ const UniversityDashboard = () => {
           </div>
 
           {showFilters && (
-            <Card className="p-4">
+            <Card className="p-4 bg-muted/30">
               <SportFilter
                 selectedSports={selectedSports}
                 onSportToggle={handleSportToggle}
@@ -241,7 +241,7 @@ const UniversityDashboard = () => {
               ))}
             </div>
           ) : (
-            <Card className="text-center py-12">
+            <Card className="text-center py-12 bg-muted/20">
               <CardContent>
                 <div className="text-6xl mb-4">🏃‍♂️</div>
                 <div className="text-xl font-semibold text-foreground mb-2">

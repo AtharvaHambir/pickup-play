@@ -102,11 +102,11 @@ const Profile = () => {
     : userGames?.filter(ug => ug.game.sport === selectedSport);
 
   const achievements = [
-    { name: 'First Game', icon: Trophy, unlocked: totalGames >= 1, color: 'text-yellow-500' },
-    { name: 'Team Player', icon: Users, unlocked: totalGames >= 5, color: 'text-blue-500' },
-    { name: 'Regular', icon: Target, unlocked: totalGames >= 10, color: 'text-green-500' },
-    { name: 'All-Star', icon: Star, unlocked: totalGames >= 25, color: 'text-purple-500' },
-    { name: 'Legend', icon: Award, unlocked: totalGames >= 50, color: 'text-red-500' },
+    { name: 'First Game', icon: Trophy, unlocked: totalGames >= 1, color: 'text-primary' },
+    { name: 'Team Player', icon: Users, unlocked: totalGames >= 5, color: 'text-accent' },
+    { name: 'Regular', icon: Target, unlocked: totalGames >= 10, color: 'text-green-muted' },
+    { name: 'All-Star', icon: Star, unlocked: totalGames >= 25, color: 'text-navy' },
+    { name: 'Legend', icon: Award, unlocked: totalGames >= 50, color: 'text-charcoal' },
   ];
 
   return (
@@ -129,7 +129,7 @@ const Profile = () => {
       {/* Profile Content */}
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Profile Header */}
-        <Card className="mb-8">
+        <Card className="mb-8 bg-card border-border">
           <CardContent className="p-8">
             <div className="flex items-center space-x-6">
               <div className="bg-primary text-white rounded-full w-20 h-20 flex items-center justify-center text-2xl font-bold">
@@ -146,7 +146,7 @@ const Profile = () => {
                   <Badge variant="outline" className="px-3 py-1">
                     Member since {format(new Date(), 'MMM yyyy')}
                   </Badge>
-                  <Badge variant="secondary" className="px-3 py-1">
+                  <Badge variant="secondary" className="px-3 py-1 bg-muted">
                     Favorite: {getSportEmoji(favoriteSport)} {favoriteSport}
                   </Badge>
                 </div>
@@ -167,10 +167,10 @@ const Profile = () => {
         </div>
 
         {/* Achievements */}
-        <Card className="mb-8">
+        <Card className="mb-8 bg-card border-border">
           <CardHeader>
             <CardTitle className="flex items-center">
-              <Trophy className="h-5 w-5 mr-2 text-yellow-500" />
+              <Trophy className="h-5 w-5 mr-2 text-primary" />
               Achievements
             </CardTitle>
           </CardHeader>
@@ -202,7 +202,7 @@ const Profile = () => {
         </Card>
 
         {/* Game History */}
-        <Card>
+        <Card className="bg-card border-border">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center">
