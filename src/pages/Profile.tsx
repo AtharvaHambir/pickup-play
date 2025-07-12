@@ -103,16 +103,16 @@ const Profile = () => {
 
   const achievements = [
     { name: 'First Game', icon: Trophy, unlocked: totalGames >= 1, color: 'text-primary' },
-    { name: 'Team Player', icon: Users, unlocked: totalGames >= 5, color: 'text-accent' },
-    { name: 'Regular', icon: Target, unlocked: totalGames >= 10, color: 'text-green-muted' },
-    { name: 'All-Star', icon: Star, unlocked: totalGames >= 25, color: 'text-navy' },
-    { name: 'Legend', icon: Award, unlocked: totalGames >= 50, color: 'text-charcoal' },
+    { name: 'Team Player', icon: Users, unlocked: totalGames >= 5, color: 'text-primary' },
+    { name: 'Regular', icon: Target, unlocked: totalGames >= 10, color: 'text-primary' },
+    { name: 'All-Star', icon: Star, unlocked: totalGames >= 25, color: 'text-foreground' },
+    { name: 'Legend', icon: Award, unlocked: totalGames >= 50, color: 'text-foreground' },
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      {/* Header with gradient */}
-      <header className="gradient-bg text-white">
+    <div className="min-h-screen bg-background">
+      {/* Header with clean gradient */}
+      <header className="bg-gradient-to-r from-primary to-accent text-white">
         <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="flex items-center justify-between">
             <div>
@@ -127,7 +127,7 @@ const Profile = () => {
       </header>
 
       {/* Profile Content */}
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-8 pb-24">
         {/* Profile Header */}
         <Card className="mb-8 bg-card border-border">
           <CardContent className="p-8">

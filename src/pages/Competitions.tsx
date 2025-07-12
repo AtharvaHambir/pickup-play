@@ -59,9 +59,9 @@ const Competitions = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      {/* Header with gradient */}
-      <header className="gradient-bg text-white">
+    <div className="min-h-screen bg-background">
+      {/* Header with clean gradient */}
+      <header className="bg-gradient-to-r from-primary to-accent text-white">
         <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="flex items-center justify-between">
             <div>

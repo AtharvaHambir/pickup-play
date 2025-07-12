@@ -1,19 +1,21 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar as CalendarIcon, Clock, MapPin, Users } from 'lucide-react';
-import BottomNavigation from '@/components/BottomNavigation';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUniversity } from '@/hooks/useUniversity';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useUniversity } from '@/hooks/useUniversity';
+import BottomNavigation from '@/components/BottomNavigation';
 import { format, isSameDay } from 'date-fns';
+import { Calendar as CalendarIcon, MapPin, Users, Clock } from 'lucide-react';
+import { getUniversityAbbreviation } from '@/utils/universityAbbreviations';
 
 const Calendar = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const { university } = useUniversity();
+  const universityAbbreviation = getUniversityAbbreviation(university?.name);
 
   const { data: games } = useQuery({
     queryKey: ['calendar-games', university?.id],
@@ -61,9 +63,9 @@ const Calendar = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      {/* Header with gradient */}
-      <header className="gradient-bg text-white">
+    <div className="min-h-screen bg-background">
+      {/* Header with clean gradient */}
+      <header className="bg-gradient-to-r from-primary to-accent text-white">
         <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="flex items-center justify-between">
             <div>
@@ -71,7 +73,7 @@ const Calendar = () => {
               <p className="text-white/80">Game Calendar</p>
             </div>
             <Badge className="bg-white/20 text-white border-white/30">
-              {games?.length || 0} upcoming games
+              {universityAbbreviation}
             </Badge>
           </div>
         </div>
