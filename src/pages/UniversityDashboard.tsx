@@ -13,7 +13,6 @@ import GameDetailsDialog from '@/components/GameDetailsDialog';
 import BottomNavigation from '@/components/BottomNavigation';
 import WelcomeSection from '@/components/dashboard/WelcomeSection';
 import QuickActions from '@/components/dashboard/QuickActions';
-import MyGamesSection from '@/components/dashboard/MyGamesSection';
 import GamesSection from '@/components/dashboard/GamesSection';
 import { getUniversityAbbreviation } from '@/utils/universityAbbreviations';
 import { useToast } from '@/hooks/use-toast';
@@ -160,8 +159,6 @@ const UniversityDashboard = () => {
         <WelcomeSection userName={userProfile?.full_name?.split(' ')[0]} />
         
         <QuickActions onCreateGame={() => setCreateGameOpen(true)} />
-        
-        <MyGamesSection games={games || []} onRefetch={refetch} />
         
         <GamesSection
           filteredGames={filteredGames}
