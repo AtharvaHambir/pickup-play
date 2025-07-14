@@ -10,7 +10,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { CalendarIcon, Clock, MapPin, Users, BookOpen } from 'lucide-react';
 import BottomNavigation from '@/components/BottomNavigation';
-import { format, isSameDay, addDays } from 'date-fns';
+import { format, isSameDay, addDays, startOfDay } from 'date-fns';
 import { getUniversityAbbreviation } from '@/utils/universityAbbreviations';
 
 const Calendar = () => {
@@ -43,7 +43,7 @@ const Calendar = () => {
     isSameDay(new Date(game.date_time), selectedDate)
   ) || [];
 
-  const datesWithGames = games?.map(game => new Date(game.date_time)) || [];
+  const datesWithGames = games?.map(game => startOfDay(new Date(game.date_time))) || [];
   const maxDate = addDays(new Date(), 14); // 2-week limit
 
   const universityAbbreviation = getUniversityAbbreviation(university?.domain || '');
@@ -122,7 +122,7 @@ const Calendar = () => {
                 selected={selectedDate}
                 onSelect={(date) => date && setSelectedDate(date)}
                 className="rounded-md border-0"
-                disabled={(date) => date > maxDate || date < new Date()}
+                disabled={(date) => date > maxDate || date < startOfDay(new Date())}
                 modifiers={{
                   booked: datesWithGames
                 }}
@@ -131,12 +131,6 @@ const Calendar = () => {
                     backgroundColor: 'hsl(var(--green-muted))', 
                     color: 'white',
                     fontWeight: 'bold'
-                  }
-                }}
-                styles={{
-                  day_today: {
-                    backgroundColor: 'transparent',
-                    color: 'inherit'
                   }
                 }}
               />
