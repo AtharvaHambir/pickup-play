@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUniversity } from '@/hooks/useUniversity';
-import { Plus, Sparkles, Users, Calendar, MapPin } from 'lucide-react';
+import { Plus, Trophy, Users, Calendar, MapPin } from 'lucide-react';
 import CreateGameDialog from '@/components/CreateGameDialog';
 import BottomNavigation from '@/components/BottomNavigation';
 import { getUniversityAbbreviation } from '@/utils/universityAbbreviations';
@@ -55,7 +55,7 @@ const Create = () => {
       bgColor: 'bg-navy/10'
     },
     {
-      icon: Sparkles,
+      icon: Trophy,
       title: 'Add Details',
       description: 'Include skill level expectations and any equipment requirements',
       color: 'text-green-muted',
@@ -80,11 +80,11 @@ const Create = () => {
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-8 pb-32">
         {/* Welcome Section */}
         <div className="mb-8 text-center">
           <h2 className="text-3xl font-bold text-foreground mb-2">
-            Ready to Start a Game? 🎮
+            Ready to Start a Game? ⚽
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Create pickup games for your university community. Set the details, invite players, and let the fun begin!

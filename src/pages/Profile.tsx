@@ -101,12 +101,43 @@ const Profile = () => {
     ? userGames 
     : userGames?.filter(ug => ug.game.sport === selectedSport);
 
+  // Dynamic achievements based on actual stats
   const achievements = [
-    { name: 'First Game', icon: Trophy, unlocked: totalGames >= 1, color: 'text-primary' },
-    { name: 'Team Player', icon: Users, unlocked: totalGames >= 5, color: 'text-primary' },
-    { name: 'Regular', icon: Target, unlocked: totalGames >= 10, color: 'text-primary' },
-    { name: 'All-Star', icon: Star, unlocked: totalGames >= 25, color: 'text-foreground' },
-    { name: 'Legend', icon: Award, unlocked: totalGames >= 50, color: 'text-foreground' },
+    { 
+      name: 'First Game', 
+      icon: Trophy, 
+      unlocked: totalGames >= 1, 
+      color: totalGames >= 1 ? 'text-primary' : 'text-muted-foreground',
+      bgColor: totalGames >= 1 ? 'border-primary bg-primary/5' : 'border-muted bg-muted/20 opacity-60'
+    },
+    { 
+      name: 'Team Player', 
+      icon: Users, 
+      unlocked: totalGames >= 5, 
+      color: totalGames >= 5 ? 'text-primary' : 'text-muted-foreground',
+      bgColor: totalGames >= 5 ? 'border-primary bg-primary/5' : 'border-muted bg-muted/20 opacity-60'
+    },
+    { 
+      name: 'Regular', 
+      icon: Target, 
+      unlocked: totalGames >= 10, 
+      color: totalGames >= 10 ? 'text-primary' : 'text-muted-foreground',
+      bgColor: totalGames >= 10 ? 'border-primary bg-primary/5' : 'border-muted bg-muted/20 opacity-60'
+    },
+    { 
+      name: 'All-Star', 
+      icon: Star, 
+      unlocked: totalGames >= 25, 
+      color: totalGames >= 25 ? 'text-foreground' : 'text-muted-foreground',
+      bgColor: totalGames >= 25 ? 'border-primary bg-primary/5' : 'border-muted bg-muted/20 opacity-60'
+    },
+    { 
+      name: 'Legend', 
+      icon: Award, 
+      unlocked: totalGames >= 50, 
+      color: totalGames >= 50 ? 'text-foreground' : 'text-muted-foreground',
+      bgColor: totalGames >= 50 ? 'border-primary bg-primary/5' : 'border-muted bg-muted/20 opacity-60'
+    },
   ];
 
   return (
@@ -127,7 +158,7 @@ const Profile = () => {
       </header>
 
       {/* Profile Content */}
-      <div className="max-w-6xl mx-auto px-4 py-8 pb-24">
+      <div className="max-w-6xl mx-auto px-4 py-8 pb-32">
         {/* Profile Header */}
         <Card className="mb-8 bg-card border-border">
           <CardContent className="p-8">
@@ -179,20 +210,12 @@ const Profile = () => {
               {achievements.map((achievement, index) => (
                 <div
                   key={index}
-                  className={`text-center p-4 rounded-lg border-2 transition-all ${
-                    achievement.unlocked
-                      ? 'border-primary bg-primary/5'
-                      : 'border-muted bg-muted/20 opacity-60'
-                  }`}
+                  className={`text-center p-4 rounded-lg border-2 transition-all ${achievement.bgColor}`}
                 >
                   <achievement.icon 
-                    className={`h-8 w-8 mx-auto mb-2 ${
-                      achievement.unlocked ? achievement.color : 'text-muted-foreground'
-                    }`} 
+                    className={`h-8 w-8 mx-auto mb-2 ${achievement.color}`} 
                   />
-                  <p className={`text-sm font-medium ${
-                    achievement.unlocked ? 'text-foreground' : 'text-muted-foreground'
-                  }`}>
+                  <p className={`text-sm font-medium ${achievement.color}`}>
                     {achievement.name}
                   </p>
                 </div>

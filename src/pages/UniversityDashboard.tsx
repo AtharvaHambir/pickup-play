@@ -128,7 +128,7 @@ const UniversityDashboard = () => {
   const universityAbbreviation = getUniversityAbbreviation(university.domain);
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background">
       {/* Header with gradient */}
       <header className="gradient-bg text-white">
         <div className="max-w-6xl mx-auto px-4 py-8">
@@ -155,7 +155,7 @@ const UniversityDashboard = () => {
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-8 pb-32">
         {/* Welcome Section */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-foreground mb-2">

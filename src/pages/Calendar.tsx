@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,15 +8,15 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUniversity } from '@/hooks/useUniversity';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { CalendarIcon, Clock, MapPin, Users, BookOpen } from 'lucide-react';
 import BottomNavigation from '@/components/BottomNavigation';
 import { format, isSameDay } from 'date-fns';
-import { Calendar as CalendarIcon, MapPin, Users, Clock } from 'lucide-react';
 import { getUniversityAbbreviation } from '@/utils/universityAbbreviations';
 
 const Calendar = () => {
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const { user } = useAuth();
   const { university } = useUniversity();
-  const universityAbbreviation = getUniversityAbbreviation(university?.name);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   const { data: games } = useQuery({
     queryKey: ['calendar-games', university?.id],
@@ -38,11 +39,13 @@ const Calendar = () => {
     enabled: !!university?.id
   });
 
-  const gamesForSelectedDate = games?.filter(game => 
-    selectedDate && isSameDay(new Date(game.date_time), selectedDate)
+  const selectedDateGames = games?.filter(game => 
+    isSameDay(new Date(game.date_time), selectedDate)
   ) || [];
 
-  const gameDates = games?.map(game => new Date(game.date_time)) || [];
+  const datesWithGames = games?.map(game => new Date(game.date_time)) || [];
+
+  const universityAbbreviation = getUniversityAbbreviation(university?.domain || '');
 
   const getSportEmoji = (sport: string) => {
     const sportEmojis: { [key: string]: string } = {
@@ -62,9 +65,33 @@ const Calendar = () => {
     return sportEmojis[sport] || '🏃';
   };
 
+  const bookingGuidelines = [
+    {
+      icon: BookOpen,
+      title: '2-Week Window',
+      description: 'Book games up to 14 days in advance',
+      color: 'text-primary',
+      bgColor: 'bg-primary/10'
+    },
+    {
+      icon: Users,
+      title: 'Fair Access',
+      description: 'Equal opportunity for all students',
+      color: 'text-green-muted',
+      bgColor: 'bg-green-muted/10'
+    },
+    {
+      icon: Clock,
+      title: 'Smart Reminders',
+      description: 'Get notified before your games',
+      color: 'text-navy',
+      bgColor: 'bg-navy/10'
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Header with clean gradient */}
+      {/* Header */}
       <header className="bg-gradient-to-r from-primary to-accent text-white">
         <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="flex items-center justify-between">
@@ -79,77 +106,70 @@ const Calendar = () => {
         </div>
       </header>
 
-      {/* Calendar Content */}
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-8 pb-32">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Calendar Widget */}
+          {/* Calendar Section */}
           <Card className="bg-card border-border">
             <CardHeader>
               <CardTitle className="flex items-center">
                 <CalendarIcon className="h-5 w-5 mr-2 text-primary" />
-                Game Calendar
+                Game Schedule
               </CardTitle>
             </CardHeader>
             <CardContent>
               <CalendarComponent
                 mode="single"
                 selected={selectedDate}
-                onSelect={setSelectedDate}
+                onSelect={(date) => date && setSelectedDate(date)}
+                className="rounded-md border-0"
                 modifiers={{
-                  hasGame: gameDates
+                  booked: datesWithGames
                 }}
                 modifiersStyles={{
-                  hasGame: { 
-                    backgroundColor: 'hsl(var(--primary))',
+                  booked: { 
+                    backgroundColor: 'hsl(var(--green-muted))', 
                     color: 'white',
                     fontWeight: 'bold'
                   }
                 }}
-                className="rounded-md border-0"
               />
-              <div className="mt-4 text-sm text-muted-foreground">
-                <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 rounded-full bg-primary"></div>
-                  <span>Days with games</span>
-                </div>
+              <div className="mt-4 flex items-center text-sm text-muted-foreground">
+                <div className="w-3 h-3 rounded-full bg-green-muted mr-2"></div>
+                Days with games
               </div>
             </CardContent>
           </Card>
 
-          {/* Games for Selected Date */}
+          {/* Selected Date Games */}
           <Card className="bg-card border-border">
             <CardHeader>
               <CardTitle>
-                {selectedDate ? format(selectedDate, 'MMMM d, yyyy') : 'Select a date'}
+                {format(selectedDate, 'EEEE, MMMM d, yyyy')}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {gamesForSelectedDate.length > 0 ? (
+              {selectedDateGames.length > 0 ? (
                 <div className="space-y-4">
-                  {gamesForSelectedDate.map((game) => (
+                  {selectedDateGames.map((game) => (
                     <div key={game.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center space-x-3">
-                          <span className="text-2xl">{getSportEmoji(game.sport)}</span>
-                          <div>
-                            <h4 className="font-semibold text-foreground">{game.sport}</h4>
-                            <div className="flex items-center text-sm text-muted-foreground mt-1">
-                              <Clock className="h-3 w-3 mr-1" />
-                              {format(new Date(game.date_time), 'h:mm a')}
-                            </div>
-                            <div className="flex items-center text-sm text-muted-foreground mt-1">
-                              <MapPin className="h-3 w-3 mr-1" />
-                              {game.location}
-                            </div>
-                            <div className="flex items-center text-sm text-muted-foreground mt-1">
-                              <Users className="h-3 w-3 mr-1" />
-                              {game.participants.filter(p => p.status === 'joined').length}/{game.max_participants} players
-                            </div>
-                          </div>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-xl">{getSportEmoji(game.sport)}</span>
+                          <h3 className="font-semibold text-foreground">{game.sport}</h3>
                         </div>
                         <Badge variant="outline" className="text-xs">
-                          {game.duration} min
+                          {game.participants.filter(p => p.status === 'joined').length}/{game.max_participants} players
                         </Badge>
+                      </div>
+                      <div className="space-y-1 text-sm text-muted-foreground">
+                        <div className="flex items-center">
+                          <Clock className="h-3 w-3 mr-2" />
+                          {format(new Date(game.date_time), 'h:mm a')} • {game.duration} min
+                        </div>
+                        <div className="flex items-center">
+                          <MapPin className="h-3 w-3 mr-2" />
+                          {game.location}
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -157,54 +177,32 @@ const Calendar = () => {
               ) : (
                 <div className="text-center py-8">
                   <CalendarIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">
-                    {selectedDate 
-                      ? 'No games scheduled for this date'
-                      : 'Select a date to view games'
-                    }
-                  </p>
+                  <p className="text-muted-foreground">No games scheduled for this date</p>
                 </div>
               )}
             </CardContent>
           </Card>
         </div>
 
-        {/* Booking Rules */}
-        <Card className="mt-8 bg-muted/20 border-border">
+        {/* Booking Guidelines */}
+        <Card className="mt-8 bg-card border-border">
           <CardHeader>
-            <CardTitle>📋 Booking Guidelines</CardTitle>
+            <CardTitle className="flex items-center">
+              <BookOpen className="h-5 w-5 mr-2 text-primary" />
+              Booking Guidelines
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="flex items-center space-x-3 p-4 bg-primary/10 rounded-lg">
-                <div className="bg-primary text-white rounded-full p-2">
-                  <CalendarIcon className="h-4 w-4" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {bookingGuidelines.map((guideline, index) => (
+                <div key={index} className="text-center">
+                  <div className={`${guideline.bgColor} rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4`}>
+                    <guideline.icon className={`h-8 w-8 ${guideline.color}`} />
+                  </div>
+                  <h3 className="font-semibold text-foreground mb-2">{guideline.title}</h3>
+                  <p className="text-sm text-muted-foreground">{guideline.description}</p>
                 </div>
-                <div>
-                  <p className="font-medium text-foreground">2-Week Window</p>
-                  <p className="text-sm text-muted-foreground">Book games up to 14 days in advance</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-3 p-4 bg-accent/10 rounded-lg">
-                <div className="bg-accent text-white rounded-full p-2">
-                  <Users className="h-4 w-4" />
-                </div>
-                <div>
-                  <p className="font-medium text-foreground">Fair Access</p>
-                  <p className="text-sm text-muted-foreground">Equal opportunity for all students</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-3 p-4 bg-navy/10 rounded-lg">
-                <div className="bg-navy text-white rounded-full p-2">
-                  <Clock className="h-4 w-4" />
-                </div>
-                <div>
-                  <p className="font-medium text-foreground">Smart Reminders</p>
-                  <p className="text-sm text-muted-foreground">Get notified before your games</p>
-                </div>
-              </div>
+              ))}
             </div>
           </CardContent>
         </Card>

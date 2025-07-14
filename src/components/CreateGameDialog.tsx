@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -48,6 +49,38 @@ const CreateGameDialog: React.FC<CreateGameDialogProps> = ({ open, onOpenChange,
     'Student Center Gym'
   ];
 
+  const checkTimeSlotConflict = async (location: string, dateTime: Date, duration: number) => {
+    const startTime = dateTime;
+    const endTime = new Date(dateTime.getTime() + duration * 60000);
+
+    const { data: conflictingGames, error } = await supabase
+      .from('games')
+      .select('id, date_time, duration')
+      .eq('location', location)
+      .eq('university_id', university.id)
+      .gte('date_time', startTime.toISOString())
+      .lt('date_time', endTime.toISOString());
+
+    if (error) throw error;
+
+    // Also check for games that start before but end during our time slot
+    const { data: overlappingGames, error: overlapError } = await supabase
+      .from('games')
+      .select('id, date_time, duration')
+      .eq('location', location)
+      .eq('university_id', university.id)
+      .lt('date_time', startTime.toISOString());
+
+    if (overlapError) throw overlapError;
+
+    const hasOverlap = overlappingGames?.some(game => {
+      const gameEndTime = new Date(new Date(game.date_time).getTime() + (game.duration || 60) * 60000);
+      return gameEndTime > startTime;
+    });
+
+    return conflictingGames.length > 0 || hasOverlap;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -56,6 +89,23 @@ const CreateGameDialog: React.FC<CreateGameDialogProps> = ({ open, onOpenChange,
     
     try {
       const dateTime = new Date(`${formData.date}T${formData.time}`);
+      
+      // Check for time slot conflicts
+      const hasConflict = await checkTimeSlotConflict(
+        formData.location, 
+        dateTime, 
+        parseInt(formData.duration)
+      );
+
+      if (hasConflict) {
+        toast({
+          title: "Time Conflict",
+          description: "This time slot at this location is already booked. Please choose a different time or location.",
+          variant: "destructive"
+        });
+        setLoading(false);
+        return;
+      }
       
       const { error } = await supabase
         .from('games')
