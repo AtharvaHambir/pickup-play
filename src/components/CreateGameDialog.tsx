@@ -108,7 +108,8 @@ const CreateGameDialog: React.FC<CreateGameDialogProps> = ({ open, onOpenChange,
         return;
       }
       
-      const { error } = await supabase
+      // Create the game
+      const { data: gameData, error: gameError } = await supabase
         .from('games')
         .insert({
           title: formData.title,
@@ -120,13 +121,26 @@ const CreateGameDialog: React.FC<CreateGameDialogProps> = ({ open, onOpenChange,
           description: formData.description || null,
           university_id: university.id,
           created_by: user.id
+        })
+        .select()
+        .single();
+
+      if (gameError) throw gameError;
+
+      // Automatically add the creator as a participant
+      const { error: participantError } = await supabase
+        .from('participants')
+        .insert({
+          game_id: gameData.id,
+          user_id: user.id,
+          status: 'joined'
         });
 
-      if (error) throw error;
+      if (participantError) throw participantError;
 
       toast({
         title: "Success!",
-        description: "Game created successfully!"
+        description: "Game created successfully! You've been automatically added to the game."
       });
 
       // Reset form
@@ -144,6 +158,7 @@ const CreateGameDialog: React.FC<CreateGameDialogProps> = ({ open, onOpenChange,
 
       onOpenChange(false);
       queryClient.invalidateQueries({ queryKey: ['games'] });
+      queryClient.invalidateQueries({ queryKey: ['my-games'] });
     } catch (error: any) {
       toast({
         title: "Error",
@@ -227,7 +242,7 @@ const CreateGameDialog: React.FC<CreateGameDialogProps> = ({ open, onOpenChange,
           </div>
 
           <div>
-            <Label htmlFor="description">Game Description</Label>
+            <Label htmlFor="description">Game expectations and equipment requirements</Label>
             <Textarea
               id="description"
               value={formData.description}

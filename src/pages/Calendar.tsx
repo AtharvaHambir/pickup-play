@@ -133,6 +133,12 @@ const Calendar = () => {
                     fontWeight: 'bold'
                   }
                 }}
+                styles={{
+                  day_today: {
+                    backgroundColor: 'transparent',
+                    color: 'inherit'
+                  }
+                }}
               />
               <div className="mt-4 flex items-center text-sm text-muted-foreground">
                 <div className="w-3 h-3 rounded-full bg-green-muted mr-2"></div>

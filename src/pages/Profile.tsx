@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -72,13 +71,12 @@ const Profile = () => {
       'Tennis': '🎾',
       'Volleyball': '🏐',
       'Football': '🏈',
-      'Baseball': '⚾',
+      'Cricket': '🏏',
       'Softball': '🥎',
-      'Swimming': '🏊',
-      'Running': '🏃',
+      'Badminton': '🏸',
+      'Spikeball': '⚪',
       'Cycling': '🚴',
-      'Ultimate Frisbee': '🥏',
-      'Badminton': '🏸'
+      'Ultimate Frisbee': '🥏'
     };
     return sportEmojis[sport] || '🏃';
   };
@@ -171,14 +169,11 @@ const Profile = () => {
                   {userProfile?.full_name || 'Student'}
                 </h2>
                 <p className="text-muted-foreground text-lg mb-4">
-                  {userProfile?.email} • {university?.name}
+                  {university?.name}
                 </p>
                 <div className="flex items-center space-x-4">
                   <Badge variant="outline" className="px-3 py-1">
                     Member since {format(new Date(), 'MMM yyyy')}
-                  </Badge>
-                  <Badge variant="secondary" className="px-3 py-1 bg-muted">
-                    Favorite: {getSportEmoji(favoriteSport)} {favoriteSport}
                   </Badge>
                 </div>
               </div>
