@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { University } from '@/hooks/useUniversity';
+import { addDays } from 'date-fns';
 
 interface CreateGameDialogProps {
   open: boolean;
@@ -38,8 +39,8 @@ const CreateGameDialog: React.FC<CreateGameDialogProps> = ({ open, onOpenChange,
 
   const sports = [
     'Basketball', 'Soccer', 'Tennis', 'Volleyball', 
-    'Football', 'Baseball', 'Softball', 'Swimming', 
-    'Running', 'Cycling', 'Ultimate Frisbee', 'Badminton'
+    'Football', 'Cricket', 'Softball', 'Badminton', 
+    'Spikeball', 'Cycling', 'Ultimate Frisbee'
   ];
 
   const locations = [
@@ -154,6 +155,8 @@ const CreateGameDialog: React.FC<CreateGameDialogProps> = ({ open, onOpenChange,
     }
   };
 
+  const maxDate = addDays(new Date(), 14).toISOString().split('T')[0];
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
@@ -184,6 +187,7 @@ const CreateGameDialog: React.FC<CreateGameDialogProps> = ({ open, onOpenChange,
                 value={formData.date}
                 onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
                 min={new Date().toISOString().split('T')[0]}
+                max={maxDate}
                 required
               />
               <Input
@@ -228,7 +232,7 @@ const CreateGameDialog: React.FC<CreateGameDialogProps> = ({ open, onOpenChange,
               id="description"
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              placeholder="Casual pickup game, all skill levels welcome!"
+              placeholder="Game expectations and equipment requirements"
               rows={3}
             />
           </div>

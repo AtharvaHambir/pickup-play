@@ -10,7 +10,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { CalendarIcon, Clock, MapPin, Users, BookOpen } from 'lucide-react';
 import BottomNavigation from '@/components/BottomNavigation';
-import { format, isSameDay } from 'date-fns';
+import { format, isSameDay, addDays } from 'date-fns';
 import { getUniversityAbbreviation } from '@/utils/universityAbbreviations';
 
 const Calendar = () => {
@@ -44,6 +44,7 @@ const Calendar = () => {
   ) || [];
 
   const datesWithGames = games?.map(game => new Date(game.date_time)) || [];
+  const maxDate = addDays(new Date(), 14); // 2-week limit
 
   const universityAbbreviation = getUniversityAbbreviation(university?.domain || '');
 
@@ -54,13 +55,12 @@ const Calendar = () => {
       'Tennis': '🎾',
       'Volleyball': '🏐',
       'Football': '🏈',
-      'Baseball': '⚾',
+      'Cricket': '🏏',
       'Softball': '🥎',
-      'Swimming': '🏊',
-      'Running': '🏃',
+      'Badminton': '🏸',
+      'Spikeball': '⚪',
       'Cycling': '🚴',
-      'Ultimate Frisbee': '🥏',
-      'Badminton': '🏸'
+      'Ultimate Frisbee': '🥏'
     };
     return sportEmojis[sport] || '🏃';
   };
@@ -122,6 +122,7 @@ const Calendar = () => {
                 selected={selectedDate}
                 onSelect={(date) => date && setSelectedDate(date)}
                 className="rounded-md border-0"
+                disabled={(date) => date > maxDate || date < new Date()}
                 modifiers={{
                   booked: datesWithGames
                 }}

@@ -57,7 +57,7 @@ const Create = () => {
     {
       icon: Trophy,
       title: 'Add Details',
-      description: 'Include skill level expectations and any equipment requirements',
+      description: 'Include game expectations and any equipment requirements',
       color: 'text-green-muted',
       bgColor: 'bg-green-muted/10'
     }
@@ -155,9 +155,9 @@ const Create = () => {
                 { name: 'Tennis', emoji: '🎾' },
                 { name: 'Volleyball', emoji: '🏐' },
                 { name: 'Football', emoji: '🏈' },
-                { name: 'Baseball', emoji: '⚾' },
-                { name: 'Swimming', emoji: '🏊' },
-                { name: 'Running', emoji: '🏃' }
+                { name: 'Cricket', emoji: '🏏' },
+                { name: 'Badminton', emoji: '🏸' },
+                { name: 'Spikeball', emoji: '⚪' }
               ].map((sport, index) => (
                 <div key={index} className="text-center p-4 bg-card rounded-lg border border-border">
                   <div className="text-3xl mb-2">{sport.emoji}</div>
