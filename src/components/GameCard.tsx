@@ -5,7 +5,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { MapPin, Clock, Users, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
-import { useAuth } from '@/contexts/AuthContext';
 
 interface GameCardProps {
   game: {
@@ -25,10 +24,8 @@ interface GameCardProps {
 }
 
 const GameCard: React.FC<GameCardProps> = ({ game, onJoin, onViewDetails }) => {
-  const { user } = useAuth();
   const currentParticipants = game.participants.filter(p => p.status === 'joined').length;
   const isFull = currentParticipants >= game.max_participants;
-  const isUserParticipant = user && game.participants.some(p => p.user_id === user.id && p.status === 'joined');
   
   const getSportEmoji = (sport: string) => {
     const sportEmojis: { [key: string]: string } = {
@@ -97,24 +94,20 @@ const GameCard: React.FC<GameCardProps> = ({ game, onJoin, onViewDetails }) => {
           </div>
 
           <div className="ml-4 flex flex-col space-y-2">
-            {!isUserParticipant && (
-              <>
-                {isFull ? (
-                  <Button variant="outline" disabled className="text-sm">
-                    Full
-                  </Button>
-                ) : (
-                  <Button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onJoin(game.id);
-                    }}
-                    className="text-sm bg-primary hover:bg-primary/90"
-                  >
-                    Join Game
-                  </Button>
-                )}
-              </>
+            {isFull ? (
+              <Button variant="outline" disabled className="text-sm">
+                Full
+              </Button>
+            ) : (
+              <Button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onJoin(game.id);
+                }}
+                className="text-sm bg-primary hover:bg-primary/90"
+              >
+                Join Game
+              </Button>
             )}
             <Button 
               variant="outline" 
