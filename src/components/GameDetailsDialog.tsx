@@ -9,7 +9,7 @@ import { format } from 'date-fns';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { University } from '@/hooks/useUniversity';
 
 interface GameDetailsDialogProps {
@@ -30,11 +30,33 @@ const GameDetailsDialog: React.FC<GameDetailsDialogProps> = ({
   const queryClient = useQueryClient();
   const [deleteLoading, setDeleteLoading] = useState(false);
 
+  // Fetch participant names
+  const { data: participantsWithNames } = useQuery({
+    queryKey: ['game-participants', game?.id],
+    queryFn: async () => {
+      if (!game?.id) return [];
+      
+      const { data, error } = await supabase
+        .from('participants')
+        .select(`
+          *,
+          user:users(full_name)
+        `)
+        .eq('game_id', game.id)
+        .eq('status', 'joined');
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!game?.id && open
+  });
+
   if (!game) return null;
 
   const isCreator = user?.id === game.created_by;
   const currentParticipants = game.participants?.filter((p: any) => p.status === 'joined').length || 0;
   const isFull = currentParticipants >= game.max_participants;
+  const isUserParticipant = user && game.participants?.some((p: any) => p.user_id === user.id && p.status === 'joined');
 
   const getSportEmoji = (sport: string) => {
     const sportEmojis: { [key: string]: string } = {
@@ -93,7 +115,7 @@ const GameDetailsDialog: React.FC<GameDetailsDialogProps> = ({
   };
 
   const handleJoinGame = async () => {
-    if (!user || isFull) return;
+    if (!user || isFull || isUserParticipant) return;
 
     try {
       const { error } = await supabase
@@ -112,6 +134,7 @@ const GameDetailsDialog: React.FC<GameDetailsDialogProps> = ({
       });
 
       queryClient.invalidateQueries({ queryKey: ['games'] });
+      queryClient.invalidateQueries({ queryKey: ['game-participants', game.id] });
     } catch (error: any) {
       toast({
         title: "Error",
@@ -119,6 +142,14 @@ const GameDetailsDialog: React.FC<GameDetailsDialogProps> = ({
         variant: "destructive"
       });
     }
+  };
+
+  const handleModifyGame = () => {
+    // TODO: Implement modify game functionality
+    toast({
+      title: "Coming Soon",
+      description: "Game modification feature will be available soon!"
+    });
   };
 
   return (
@@ -181,16 +212,14 @@ const GameDetailsDialog: React.FC<GameDetailsDialogProps> = ({
           <Card>
             <CardContent className="p-6">
               <h3 className="font-semibold mb-3">Participants ({currentParticipants})</h3>
-              {game.participants && game.participants.length > 0 ? (
+              {participantsWithNames && participantsWithNames.length > 0 ? (
                 <div className="space-y-2">
-                  {game.participants
-                    .filter((p: any) => p.status === 'joined')
-                    .map((participant: any, index: number) => (
-                      <div key={index} className="flex items-center justify-between p-2 bg-muted/50 rounded">
-                        <span>Player {index + 1}</span>
-                        <Badge variant="outline" className="text-xs">Joined</Badge>
-                      </div>
-                    ))}
+                  {participantsWithNames.map((participant: any, index: number) => (
+                    <div key={participant.id} className="flex items-center justify-between p-2 bg-muted/50 rounded">
+                      <span>{participant.user?.full_name || `Player ${index + 1}`}</span>
+                      <Badge variant="outline" className="text-xs">Joined</Badge>
+                    </div>
+                  ))}
                 </div>
               ) : (
                 <p className="text-muted-foreground">No participants yet</p>
@@ -200,7 +229,7 @@ const GameDetailsDialog: React.FC<GameDetailsDialogProps> = ({
 
           {/* Action Buttons */}
           <div className="flex flex-col space-y-3">
-            {!isCreator && (
+            {!isCreator && !isUserParticipant && (
               <>
                 {isFull ? (
                   <Button variant="outline" disabled className="w-full">
@@ -224,7 +253,7 @@ const GameDetailsDialog: React.FC<GameDetailsDialogProps> = ({
 
             {isCreator && (
               <div className="space-y-3">
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full" onClick={handleModifyGame}>
                   <Edit3 className="h-4 w-4 mr-2" />
                   Modify Game
                 </Button>
@@ -244,6 +273,13 @@ const GameDetailsDialog: React.FC<GameDetailsDialogProps> = ({
                   Manage Game Chat
                 </Button>
               </div>
+            )}
+
+            {isUserParticipant && !isCreator && (
+              <Button variant="outline" className="w-full">
+                <MessageCircle className="h-4 w-4 mr-2" />
+                Join Game Chat
+              </Button>
             )}
           </div>
         </div>

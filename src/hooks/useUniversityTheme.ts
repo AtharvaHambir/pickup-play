@@ -18,19 +18,26 @@ export const useUniversityTheme = () => {
       root.style.setProperty('--university-background', colors.background);
 
       // Update primary colors to match university theme
-      root.style.setProperty('--primary', colors.secondary);
+      root.style.setProperty('--primary', colors.primary);
       root.style.setProperty('--accent', colors.accent);
+
+      // Update tab title based on university
+      document.title = `PickupPlay | ${university.name}`;
+    } else {
+      // Default title for general pages
+      document.title = 'PickupPlay';
     }
 
     return () => {
-      // Reset to default colors when component unmounts
+      // Reset to default colors and title when component unmounts
       const root = document.documentElement;
       root.style.removeProperty('--university-primary');
       root.style.removeProperty('--university-secondary');
       root.style.removeProperty('--university-accent');
       root.style.removeProperty('--university-background');
+      document.title = 'PickupPlay';
     };
-  }, [university?.domain]);
+  }, [university?.domain, university?.name]);
 
   return university;
 };
