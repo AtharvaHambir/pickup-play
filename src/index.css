@@ -16,7 +16,7 @@
     --popover: 0 0% 100%; /* White */
     --popover-foreground: 0 0% 20%; /* Dark Charcoal / Near-Black */
 
-    --primary: 120 15% 48%; /* Muted Green Accent */
+    --primary: 0 0% 20%; /* Dark Charcoal */
     --primary-foreground: 0 0% 100%; /* White */
 
     --secondary: 210 17% 98%; /* Off-White / Very Light Gray */
@@ -25,7 +25,7 @@
     --muted: 210 17% 98%; /* Off-White / Very Light Gray */
     --muted-foreground: 215 14% 44%; /* Soft Gray */
 
-    --accent: 120 15% 48%; /* Muted Green Accent */
+    --accent: 0 0% 40%; /* Steel Gray */
     --accent-foreground: 0 0% 100%; /* White */
 
     --destructive: 330 77% 51%; /* Keep existing destructive color */
@@ -33,7 +33,7 @@
 
     --border: 220 13% 91%; /* Light border color */
     --input: 220 13% 91%; /* Light input border */
-    --ring: 120 15% 48%; /* Muted Green Accent */
+    --ring: 0 0% 20%; /* Dark Charcoal */
 
     --radius: 0.75rem;
 
@@ -44,18 +44,18 @@
 
     /* University-specific color variables (will be dynamically set) */
     --university-primary: 0 0% 20%;
-    --university-secondary: 120 15% 48%;
+    --university-secondary: 0 84% 47%;
     --university-accent: 215 14% 44%;
     --university-background: 0 0% 100%;
 
     --sidebar-background: 0 0% 100%; /* White */
     --sidebar-foreground: 0 0% 20%; /* Dark Charcoal / Near-Black */
-    --sidebar-primary: 120 15% 48%; /* Muted Green Accent */
+    --sidebar-primary: 0 0% 20%; /* Dark Charcoal */
     --sidebar-primary-foreground: 0 0% 100%; /* White */
     --sidebar-accent: 210 17% 98%; /* Off-White / Very Light Gray */
     --sidebar-accent-foreground: 0 0% 20%; /* Dark Charcoal / Near-Black */
     --sidebar-border: 220 13% 91%; /* Light border */
-    --sidebar-ring: 120 15% 48%; /* Muted Green Accent */
+    --sidebar-ring: 0 0% 20%; /* Dark Charcoal */
   }
 
   .dark {
@@ -68,7 +68,7 @@
     --popover: 215 25% 27%; /* Darker popover background */
     --popover-foreground: 210 17% 98%; /* Off-White / Very Light Gray */
 
-    --primary: 120 15% 48%; /* Muted Green Accent */
+    --primary: 0 0% 20%; /* Dark Charcoal */
     --primary-foreground: 0 0% 100%; /* White */
 
     --secondary: 215 25% 27%; /* Darker secondary */
@@ -77,7 +77,7 @@
     --muted: 215 25% 27%; /* Darker muted */
     --muted-foreground: 215 20% 65%; /* Lighter soft gray for dark mode */
 
-    --accent: 120 15% 48%; /* Muted Green Accent */
+    --accent: 0 0% 40%; /* Steel Gray */
     --accent-foreground: 0 0% 100%; /* White */
 
     --destructive: 330 77% 51%; /* Keep existing destructive color */
@@ -85,16 +85,16 @@
 
     --border: 215 25% 35%; /* Darker border */
     --input: 215 25% 35%; /* Darker input border */
-    --ring: 120 15% 48%; /* Muted Green Accent */
+    --ring: 0 0% 20%; /* Dark Charcoal */
 
     --sidebar-background: 215 28% 17%; /* Deep Navy-Black */
     --sidebar-foreground: 210 17% 98%; /* Off-White / Very Light Gray */
-    --sidebar-primary: 120 15% 48%; /* Muted Green Accent */
+    --sidebar-primary: 0 0% 20%; /* Dark Charcoal */
     --sidebar-primary-foreground: 0 0% 100%; /* White */
     --sidebar-accent: 215 25% 27%; /* Darker accent */
     --sidebar-accent-foreground: 210 17% 98%; /* Off-White / Very Light Gray */
     --sidebar-border: 215 25% 35%; /* Darker border */
-    --sidebar-ring: 120 15% 48%; /* Muted Green Accent */
+    --sidebar-ring: 0 0% 20%; /* Dark Charcoal */
   }
 }
 
@@ -122,9 +122,9 @@
   }
 }
 
-/* Clean gradient using navy and green */
+/* Clean gradient using navy and appropriate colors */
 .gradient-bg {
-  background: linear-gradient(135deg, hsl(var(--navy)) 0%, hsl(var(--green-muted)) 100%);
+  background: linear-gradient(135deg, hsl(var(--university-primary)) 0%, hsl(var(--university-secondary)) 100%);
 }
 
 /* University-specific gradient */
