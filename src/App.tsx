@@ -1,5 +1,4 @@
 
-import React from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,83 +12,57 @@ import Competitions from "@/pages/Competitions";
 import Profile from "@/pages/Profile";
 import Create from "@/pages/Create";
 import MyGames from "@/pages/MyGames";
-import Settings from "@/pages/Settings";
-import Friends from "@/pages/Friends";
-import Help from "@/pages/Help";
-import Legal from "@/pages/Legal";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const App: React.FC = () => {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          <div className="min-h-screen w-full overflow-x-hidden">
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={
-                  <ProtectedRoute>
-                    <UniversityDashboard />
-                  </ProtectedRoute>
-                } />
-                <Route path="/calendar" element={
-                  <ProtectedRoute>
-                    <Calendar />
-                  </ProtectedRoute>
-                } />
-                <Route path="/create" element={
-                  <ProtectedRoute>
-                    <Create />
-                  </ProtectedRoute>
-                } />
-                <Route path="/my-games" element={
-                  <ProtectedRoute>
-                    <MyGames />
-                  </ProtectedRoute>
-                } />
-                <Route path="/compete" element={
-                  <ProtectedRoute>
-                    <Competitions />
-                  </ProtectedRoute>
-                } />
-                <Route path="/profile" element={
-                  <ProtectedRoute>
-                    <Profile />
-                  </ProtectedRoute>
-                } />
-                <Route path="/settings" element={
-                  <ProtectedRoute>
-                    <Settings />
-                  </ProtectedRoute>
-                } />
-                <Route path="/friends" element={
-                  <ProtectedRoute>
-                    <Friends />
-                  </ProtectedRoute>
-                } />
-                <Route path="/help" element={
-                  <ProtectedRoute>
-                    <Help />
-                  </ProtectedRoute>
-                } />
-                <Route path="/legal" element={
-                  <ProtectedRoute>
-                    <Legal />
-                  </ProtectedRoute>
-                } />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </div>
-        </TooltipProvider>
-      </AuthProvider>
-    </QueryClientProvider>
-  );
-};
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <AuthProvider>
+      <TooltipProvider>
+        <div className="min-h-screen w-full overflow-x-hidden">
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={
+                <ProtectedRoute>
+                  <UniversityDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/calendar" element={
+                <ProtectedRoute>
+                  <Calendar />
+                </ProtectedRoute>
+              } />
+              <Route path="/create" element={
+                <ProtectedRoute>
+                  <Create />
+                </ProtectedRoute>
+              } />
+              <Route path="/my-games" element={
+                <ProtectedRoute>
+                  <MyGames />
+                </ProtectedRoute>
+              } />
+              <Route path="/compete" element={
+                <ProtectedRoute>
+                  <Competitions />
+                </ProtectedRoute>
+              } />
+              <Route path="/profile" element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              } />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </div>
+      </TooltipProvider>
+    </AuthProvider>
+  </QueryClientProvider>
+);
 
 export default App;
