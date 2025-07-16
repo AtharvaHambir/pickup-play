@@ -12,6 +12,10 @@ import Competitions from "@/pages/Competitions";
 import Profile from "@/pages/Profile";
 import Create from "@/pages/Create";
 import MyGames from "@/pages/MyGames";
+import Settings from "@/pages/Settings";
+import Friends from "@/pages/Friends";
+import Help from "@/pages/Help";
+import Legal from "@/pages/Legal";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -53,6 +57,26 @@ const App = () => (
               <Route path="/profile" element={
                 <ProtectedRoute>
                   <Profile />
+                </ProtectedRoute>
+              } />
+              <Route path="/settings" element={
+                <ProtectedRoute>
+                  <Settings />
+                </ProtectedRoute>
+              } />
+              <Route path="/friends" element={
+                <ProtectedRoute>
+                  <Friends />
+                </ProtectedRoute>
+              } />
+              <Route path="/help" element={
+                <ProtectedRoute>
+                  <Help />
+                </ProtectedRoute>
+              } />
+              <Route path="/legal" element={
+                <ProtectedRoute>
+                  <Legal />
                 </ProtectedRoute>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

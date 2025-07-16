@@ -14,6 +14,8 @@ import BottomNavigation from '@/components/BottomNavigation';
 import WelcomeSection from '@/components/dashboard/WelcomeSection';
 import QuickActions from '@/components/dashboard/QuickActions';
 import GamesSection from '@/components/dashboard/GamesSection';
+import SidebarNavigation from '@/components/SidebarNavigation';
+import HamburgerButton from '@/components/HamburgerButton';
 import { getUniversityAbbreviation } from '@/utils/universityAbbreviations';
 import { useToast } from '@/hooks/use-toast';
 
@@ -43,6 +45,7 @@ const UniversityDashboard = () => {
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const [selectedSports, setSelectedSports] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const { data: games, isLoading, refetch } = useQuery({
     queryKey: ['games', university?.id],
@@ -137,9 +140,12 @@ const UniversityDashboard = () => {
       <header className="bg-gradient-to-r from-[hsl(var(--university-primary))] to-[hsl(var(--university-secondary))] text-white">
         <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold">PickupPlay</h1>
-              <p className="text-white/80">{university?.name}</p>
+            <div className="flex items-center space-x-3">
+              <HamburgerButton onClick={() => setSidebarOpen(true)} />
+              <div>
+                <h1 className="text-3xl font-bold">PickupPlay</h1>
+                <p className="text-white/80">{university?.name}</p>
+              </div>
             </div>
             <div className="flex items-center space-x-3">
               <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
@@ -177,6 +183,11 @@ const UniversityDashboard = () => {
           onViewDetails={setSelectedGame}
         />
       </div>
+
+      <SidebarNavigation 
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
       <CreateGameDialog 
         open={createGameOpen}
