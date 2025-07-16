@@ -31,7 +31,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({ onCreateGame }) => {
       </Card>
 
       <Card 
-        className="bg-gradient-to-br from-green-600 to-green-700 text-white cursor-pointer hover:shadow-lg transition-shadow"
+        className="bg-gradient-to-br from-[hsl(var(--university-secondary))] to-[hsl(var(--university-accent))] text-white cursor-pointer hover:shadow-lg transition-shadow"
         onClick={() => navigate('/my-games')}
       >
         <CardContent className="p-6">
