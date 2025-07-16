@@ -273,7 +273,7 @@ const CreateGameDialog: React.FC<CreateGameDialogProps> = ({ open, onOpenChange,
             disabled={loading} 
             className="w-full bg-primary hover:bg-primary/90"
           >
-            {loading ? 'Creating...' : 'Create Game & Send Invites'}
+            {loading ? 'Creating...' : 'Create Game'}
           </Button>
         </form>
       </DialogContent>
