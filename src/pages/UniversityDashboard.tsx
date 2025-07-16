@@ -1,10 +1,10 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUniversity } from '@/hooks/useUniversity';
+import { useUniversityTheme } from '@/hooks/useUniversityTheme';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { LogOut } from 'lucide-react';
@@ -35,6 +35,10 @@ const UniversityDashboard = () => {
   const { signOut, user } = useAuth();
   const { university, userProfile } = useUniversity();
   const { toast } = useToast();
+  
+  // Apply university-specific theming
+  useUniversityTheme();
+
   const [createGameOpen, setCreateGameOpen] = useState(false);
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const [selectedSports, setSelectedSports] = useState<string[]>([]);
@@ -129,13 +133,13 @@ const UniversityDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header with gradient */}
-      <header className="gradient-bg text-white">
+      {/* Header with university-specific gradient */}
+      <header className="bg-gradient-to-r from-[hsl(var(--university-primary))] to-[hsl(var(--university-secondary))] text-white">
         <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold">PickupPlay</h1>
-              <p className="text-white/80">{university.name}</p>
+              <p className="text-white/80">{university?.name}</p>
             </div>
             <div className="flex items-center space-x-3">
               <Badge variant="secondary" className="bg-white/20 text-white border-white/30">

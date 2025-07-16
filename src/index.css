@@ -42,6 +42,12 @@
     --charcoal: 0 0% 20%; /* Dark Charcoal */
     --green-muted: 120 15% 48%; /* Muted Green Accent */
 
+    /* University-specific color variables (will be dynamically set) */
+    --university-primary: 0 0% 20%;
+    --university-secondary: 120 15% 48%;
+    --university-accent: 215 14% 44%;
+    --university-background: 0 0% 100%;
+
     --sidebar-background: 0 0% 100%; /* White */
     --sidebar-foreground: 0 0% 20%; /* Dark Charcoal / Near-Black */
     --sidebar-primary: 120 15% 48%; /* Muted Green Accent */
@@ -121,6 +127,11 @@
   background: linear-gradient(135deg, hsl(var(--navy)) 0%, hsl(var(--green-muted)) 100%);
 }
 
+/* University-specific gradient */
+.university-gradient {
+  background: linear-gradient(135deg, hsl(var(--university-primary)) 0%, hsl(var(--university-secondary)) 100%);
+}
+
 .glass-effect {
   backdrop-filter: blur(20px);
   background: rgba(255, 255, 255, 0.1);
@@ -150,6 +161,31 @@
 
 .bg-green-muted {
   background-color: hsl(var(--green-muted));
+}
+
+/* University color utilities */
+.university-primary {
+  color: hsl(var(--university-primary));
+}
+
+.bg-university-primary {
+  background-color: hsl(var(--university-primary));
+}
+
+.university-secondary {
+  color: hsl(var(--university-secondary));
+}
+
+.bg-university-secondary {
+  background-color: hsl(var(--university-secondary));
+}
+
+.university-accent {
+  color: hsl(var(--university-accent));
+}
+
+.bg-university-accent {
+  background-color: hsl(var(--university-accent));
 }
 
 /* Responsive utilities */
