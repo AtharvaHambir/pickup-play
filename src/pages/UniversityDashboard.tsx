@@ -7,13 +7,14 @@ import { useUniversity } from '@/hooks/useUniversity';
 import { useUniversityTheme } from '@/hooks/useUniversityTheme';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { LogOut } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import CreateGameDialog from '@/components/CreateGameDialog';
 import GameDetailsDialog from '@/components/GameDetailsDialog';
 import BottomNavigation from '@/components/BottomNavigation';
 import WelcomeSection from '@/components/dashboard/WelcomeSection';
 import QuickActions from '@/components/dashboard/QuickActions';
 import GamesSection from '@/components/dashboard/GamesSection';
+import AppSidebar from '@/components/AppSidebar';
 import { getUniversityAbbreviation } from '@/utils/universityAbbreviations';
 import { useToast } from '@/hooks/use-toast';
 
@@ -32,7 +33,7 @@ interface Game {
 }
 
 const UniversityDashboard = () => {
-  const { signOut, user } = useAuth();
+  const { user } = useAuth();
   const { university, userProfile } = useUniversity();
   const { toast } = useToast();
   
@@ -43,6 +44,7 @@ const UniversityDashboard = () => {
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const [selectedSports, setSelectedSports] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const { data: games, isLoading, refetch } = useQuery({
     queryKey: ['games', university?.id],
@@ -115,9 +117,6 @@ const UniversityDashboard = () => {
             <p className="text-sm text-muted-foreground">
               Contact us to add support for your university!
             </p>
-            <Button onClick={signOut} variant="outline">
-              Sign Out
-            </Button>
           </CardContent>
         </Card>
       </div>
@@ -146,13 +145,12 @@ const UniversityDashboard = () => {
                 {universityAbbreviation}
               </Badge>
               <Button
-                onClick={signOut}
+                onClick={() => setSidebarOpen(true)}
                 variant="ghost"
                 size="sm"
                 className="text-white hover:bg-white/20"
               >
-                <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
+                <Menu className="h-5 w-5" />
               </Button>
             </div>
           </div>
@@ -189,6 +187,11 @@ const UniversityDashboard = () => {
         open={!!selectedGame}
         onOpenChange={(open) => !open && setSelectedGame(null)}
         university={university}
+      />
+
+      <AppSidebar 
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
       />
 
       <BottomNavigation />
