@@ -1,17 +1,19 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Clock, Calendar, LogOut, ArrowLeft } from 'lucide-react';
+import { MapPin, Clock, Calendar, LogOut, Menu } from 'lucide-react';
 import { format } from 'date-fns';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUniversity } from '@/hooks/useUniversity';
+import { useUniversityTheme } from '@/hooks/useUniversityTheme';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import BottomNavigation from '@/components/BottomNavigation';
+import AppSidebar from '@/components/AppSidebar';
 import { getUniversityAbbreviation } from '@/utils/universityAbbreviations';
 
 const MyGames = () => {
@@ -19,6 +21,10 @@ const MyGames = () => {
   const { university } = useUniversity();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  
+  // Apply university-specific theming
+  useUniversityTheme();
 
   const { data: games, refetch } = useQuery({
     queryKey: ['my-games', user?.id],
@@ -93,27 +99,26 @@ const MyGames = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-gradient-to-r from-primary to-accent text-white">
+      <header className="bg-gradient-to-r from-[hsl(var(--university-primary))] to-[hsl(var(--university-secondary))] text-white">
         <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+            <div>
+              <h1 className="text-3xl font-bold">PickupPlay</h1>
+              <p className="text-white/80">My Games</p>
+            </div>
+            <div className="flex items-center space-x-3">
+              <Badge className="bg-white/20 text-white border-white/30">
+                {universityAbbreviation}
+              </Badge>
               <Button
+                onClick={() => setSidebarOpen(true)}
                 variant="ghost"
                 size="sm"
-                onClick={() => navigate('/')}
                 className="text-white hover:bg-white/20"
               >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
+                <Menu className="h-5 w-5" />
               </Button>
-              <div>
-                <h1 className="text-3xl font-bold">PickupPlay</h1>
-                <p className="text-white/80">My Games</p>
-              </div>
             </div>
-            <Badge className="bg-white/20 text-white border-white/30">
-              {universityAbbreviation}
-            </Badge>
           </div>
         </div>
       </header>
@@ -182,6 +187,11 @@ const MyGames = () => {
           </CardContent>
         </Card>
       </div>
+
+      <AppSidebar 
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
       <BottomNavigation />
     </div>

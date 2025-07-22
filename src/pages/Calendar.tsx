@@ -6,10 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUniversity } from '@/hooks/useUniversity';
+import { useUniversityTheme } from '@/hooks/useUniversityTheme';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { CalendarIcon, Clock, MapPin, Users, BookOpen } from 'lucide-react';
+import { CalendarIcon, Clock, MapPin, Users, BookOpen, Menu } from 'lucide-react';
 import BottomNavigation from '@/components/BottomNavigation';
+import AppSidebar from '@/components/AppSidebar';
 import { format, isSameDay, addDays, startOfDay } from 'date-fns';
 import { getUniversityAbbreviation } from '@/utils/universityAbbreviations';
 
@@ -17,6 +19,10 @@ const Calendar = () => {
   const { user } = useAuth();
   const { university } = useUniversity();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  
+  // Apply university-specific theming
+  useUniversityTheme();
 
   const { data: games } = useQuery({
     queryKey: ['calendar-games', university?.id],
@@ -92,16 +98,26 @@ const Calendar = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-gradient-to-r from-primary to-accent text-white">
+      <header className="bg-gradient-to-r from-[hsl(var(--university-primary))] to-[hsl(var(--university-secondary))] text-white">
         <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold">PickupPlay</h1>
               <p className="text-white/80">Game Calendar</p>
             </div>
-            <Badge className="bg-white/20 text-white border-white/30">
-              {universityAbbreviation}
-            </Badge>
+            <div className="flex items-center space-x-3">
+              <Badge className="bg-white/20 text-white border-white/30">
+                {universityAbbreviation}
+              </Badge>
+              <Button
+                onClick={() => setSidebarOpen(true)}
+                variant="ghost"
+                size="sm"
+                className="text-white hover:bg-white/20"
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -208,6 +224,11 @@ const Calendar = () => {
           </CardContent>
         </Card>
       </div>
+
+      <AppSidebar 
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
       <BottomNavigation />
     </div>

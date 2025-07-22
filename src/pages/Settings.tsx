@@ -5,17 +5,21 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUniversity } from '@/hooks/useUniversity';
 import { useUniversityTheme } from '@/hooks/useUniversityTheme';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { LogOut, Settings as SettingsIcon } from 'lucide-react';
+import { LogOut, Settings as SettingsIcon, Menu } from 'lucide-react';
+import AppSidebar from '@/components/AppSidebar';
+import { getUniversityAbbreviation } from '@/utils/universityAbbreviations';
 
 const Settings = () => {
   const { signOut, user } = useAuth();
-  const { userProfile } = useUniversity();
+  const { userProfile, university } = useUniversity();
   const { toast } = useToast();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   
   // Apply university-specific theming
   useUniversityTheme();
@@ -56,14 +60,31 @@ const Settings = () => {
     }
   };
 
+  const universityAbbreviation = getUniversityAbbreviation(university?.domain || '');
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header with university-specific gradient */}
       <header className="bg-gradient-to-r from-[hsl(var(--university-primary))] to-[hsl(var(--university-secondary))] text-white">
         <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="flex items-center space-x-3">
-            <SettingsIcon className="h-8 w-8" />
-            <h1 className="text-3xl font-bold">Settings</h1>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <SettingsIcon className="h-8 w-8" />
+              <h1 className="text-3xl font-bold">Settings</h1>
+            </div>
+            <div className="flex items-center space-x-3">
+              <Badge className="bg-white/20 text-white border-white/30">
+                {universityAbbreviation}
+              </Badge>
+              <Button
+                onClick={() => setSidebarOpen(true)}
+                variant="ghost"
+                size="sm"
+                className="text-white hover:bg-white/20"
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -191,6 +212,11 @@ const Settings = () => {
           </CardContent>
         </Card>
       </div>
+
+      <AppSidebar 
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
     </div>
   );
 };
