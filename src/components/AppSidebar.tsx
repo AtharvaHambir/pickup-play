@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Home, Calendar, Trophy, User, Settings, LogOut, ArrowLeft, X, Users } from 'lucide-react';
+import { Home, Calendar, Trophy, User, Settings, LogOut, X, Users, HelpCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUniversity } from '@/hooks/useUniversity';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,6 @@ interface AppSidebarProps {
 const AppSidebar: React.FC<AppSidebarProps> = ({ isOpen, onClose }) => {
   const { signOut } = useAuth();
   const { university } = useUniversity();
-  const navigate = useNavigate();
 
   const menuItems = [
     { title: 'Dashboard', url: '/', icon: Home },
@@ -25,16 +24,12 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isOpen, onClose }) => {
     { title: 'Friends', url: '/friends', icon: Users },
     { title: 'Profile', url: '/profile', icon: User },
     { title: 'Settings', url: '/settings', icon: Settings },
+    { title: 'Help & Support', url: '/help-support', icon: HelpCircle },
   ];
 
   const universityAbbreviation = university ? getUniversityAbbreviation(university.domain) : '';
 
   const handleNavClick = () => {
-    onClose();
-  };
-
-  const handleBack = () => {
-    navigate(-1);
     onClose();
   };
 
@@ -61,7 +56,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isOpen, onClose }) => {
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="bg-gradient-to-r from-[hsl(var(--university-primary))] to-[hsl(var(--university-secondary))] text-white p-6">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-bold">PickupPlay</h2>
                 <p className="text-white/80 text-sm">{university?.name}</p>
@@ -80,16 +75,6 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isOpen, onClose }) => {
                 </Button>
               </div>
             </div>
-            
-            {/* Back Button */}
-            <Button
-              onClick={handleBack}
-              variant="ghost"
-              className="w-full justify-start text-white hover:bg-white/20"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
-            </Button>
           </div>
 
           {/* Navigation */}

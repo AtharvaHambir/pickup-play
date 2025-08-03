@@ -14,6 +14,7 @@ import Create from "@/pages/Create";
 import MyGames from "@/pages/MyGames";
 import Settings from "@/pages/Settings";
 import Friends from "@/pages/Friends";
+import HelpSupport from "@/pages/HelpSupport";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -65,6 +66,11 @@ const App = () => (
               <Route path="/friends" element={
                 <ProtectedRoute>
                   <Friends />
+                </ProtectedRoute>
+              } />
+              <Route path="/help-support" element={
+                <ProtectedRoute>
+                  <HelpSupport />
                 </ProtectedRoute>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
