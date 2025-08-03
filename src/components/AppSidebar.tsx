@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Home, Calendar, Trophy, User, Settings, LogOut, ArrowLeft, X } from 'lucide-react';
+import { Home, Calendar, Trophy, User, Settings, LogOut, ArrowLeft, X, Users } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUniversity } from '@/hooks/useUniversity';
 import { Button } from '@/components/ui/button';
@@ -21,6 +22,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isOpen, onClose }) => {
     { title: 'Dashboard', url: '/', icon: Home },
     { title: 'Calendar', url: '/calendar', icon: Calendar },
     { title: 'My Games', url: '/my-games', icon: Trophy },
+    { title: 'Friends', url: '/friends', icon: Users },
     { title: 'Profile', url: '/profile', icon: User },
     { title: 'Settings', url: '/settings', icon: Settings },
   ];
