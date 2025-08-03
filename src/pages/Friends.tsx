@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
-import { Search, UserPlus, Users, Calendar } from 'lucide-react';
+import { ArrowLeft, Menu, Search, UserPlus, Users, Calendar } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,7 +12,12 @@ import AppSidebar from '@/components/AppSidebar';
 const Friends: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
   useUniversityTheme();
+
+  const handleBack = () => {
+    navigate(-1);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20">
@@ -33,9 +39,19 @@ const Friends: React.FC = () => {
               variant="ghost"
               className="text-white hover:bg-white/20 lg:hidden"
             >
-              ☰
+              <Menu className="h-6 w-6" />
             </Button>
           </div>
+          
+          {/* Back Button */}
+          <Button
+            onClick={handleBack}
+            variant="ghost"
+            className="mt-4 text-white hover:bg-white/20"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
         </div>
       </div>
 
