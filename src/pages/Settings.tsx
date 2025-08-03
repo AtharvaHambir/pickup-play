@@ -1,164 +1,222 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Menu, Settings as SettingsIcon, User, Bell, Shield, Palette } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUniversity } from '@/hooks/useUniversity';
 import { useUniversityTheme } from '@/hooks/useUniversityTheme';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { LogOut, Settings as SettingsIcon, Menu } from 'lucide-react';
 import AppSidebar from '@/components/AppSidebar';
+import { getUniversityAbbreviation } from '@/utils/universityAbbreviations';
 
-const Settings: React.FC = () => {
+const Settings = () => {
+  const { signOut, user } = useAuth();
+  const { userProfile, university } = useUniversity();
+  const { toast } = useToast();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const navigate = useNavigate();
+  
+  // Apply university-specific theming
   useUniversityTheme();
 
-  const handleBack = () => {
-    navigate(-1);
+  const [fullName, setFullName] = useState(userProfile?.full_name || '');
+  const [notifications, setNotifications] = useState({
+    gameReminders: true,
+    gameInvites: true,
+    lastMinuteOpenings: false
+  });
+  const [allowProfileView, setAllowProfileView] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const handleUpdateProfile = async () => {
+    if (!user || !fullName.trim()) return;
+
+    setIsUpdating(true);
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({ full_name: fullName.trim() })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success!",
+        description: "Your profile has been updated."
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive"
+      });
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [darkModeEnabled, setDarkModeEnabled] = useState(false);
-  const [privacyModeEnabled, setPrivacyModeEnabled] = useState(false);
+  const universityAbbreviation = getUniversityAbbreviation(university?.domain || '');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20">
-      <AppSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      
-      {/* Header */}
-      <div className="bg-gradient-to-r from-[hsl(var(--university-primary))] to-[hsl(var(--university-secondary))] text-white">
-        <div className="max-w-6xl mx-auto px-4 py-6">
+    <div className="min-h-screen bg-background">
+      {/* Header with university-specific gradient */}
+      <header className="bg-gradient-to-r from-[hsl(var(--university-primary))] to-[hsl(var(--university-secondary))] text-white">
+        <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <SettingsIcon className="h-8 w-8" />
-              <div>
-                <h1 className="text-3xl font-bold">Settings</h1>
-                <p className="text-white/80">Customize your experience</p>
-              </div>
+              <h1 className="text-3xl font-bold">Settings</h1>
             </div>
-            <Button
-              onClick={() => setSidebarOpen(true)}
-              variant="ghost"
-              className="text-white hover:bg-white/20 lg:hidden"
-            >
-              <Menu className="h-6 w-6" />
-            </Button>
+            <div className="flex items-center space-x-3">
+              <Badge className="bg-white/20 text-white border-white/30">
+                {universityAbbreviation}
+              </Badge>
+              <Button
+                onClick={() => setSidebarOpen(true)}
+                variant="ghost"
+                size="sm"
+                className="text-white hover:bg-white/20"
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
-          
-          {/* Back Button */}
-          <Button
-            onClick={handleBack}
-            variant="ghost"
-            className="mt-4 text-white hover:bg-white/20"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-        {/* Account Settings */}
-        <Card className="shadow-sm border-0 bg-white/50 backdrop-blur-sm">
+      <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+        {/* Profile Info */}
+        <Card>
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <User className="h-5 w-5 text-primary" />
-              <span>Account</span>
-            </CardTitle>
+            <CardTitle>Profile Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="notifications">
-                <div className="space-y-0.5">
-                  <p className="text-sm font-medium leading-none">Notifications</p>
-                  <p className="text-sm text-muted-foreground">Enable push notifications</p>
-                </div>
-              </Label>
-              <Switch
-                id="notifications"
-                checked={notificationsEnabled}
-                onCheckedChange={(checked) => setNotificationsEnabled(checked)}
+            <div className="space-y-2">
+              <Label htmlFor="email">University Email</Label>
+              <Input
+                id="email"
+                value={user?.email || ''}
+                disabled
+                className="bg-muted"
               />
             </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="dark-mode">
-                <div className="space-y-0.5">
-                  <p className="text-sm font-medium leading-none">Dark Mode</p>
-                  <p className="text-sm text-muted-foreground">Toggle dark mode appearance</p>
-                </div>
-              </Label>
-              <Switch
-                id="dark-mode"
-                checked={darkModeEnabled}
-                onCheckedChange={(checked) => setDarkModeEnabled(checked)}
+            <div className="space-y-2">
+              <Label htmlFor="fullName">Full Name</Label>
+              <Input
+                id="fullName"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="Enter your full name"
               />
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Privacy Settings */}
-        <Card className="shadow-sm border-0 bg-white/50 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Shield className="h-5 w-5 text-primary" />
-              <span>Privacy</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="privacy-mode">
-                <div className="space-y-0.5">
-                  <p className="text-sm font-medium leading-none">Privacy Mode</p>
-                  <p className="text-sm text-muted-foreground">Hide your profile from public view</p>
-                </div>
-              </Label>
-              <Switch
-                id="privacy-mode"
-                checked={privacyModeEnabled}
-                onCheckedChange={(checked) => setPrivacyModeEnabled(checked)}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Appearance Settings */}
-        <Card className="shadow-sm border-0 bg-white/50 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Palette className="h-5 w-5 text-primary" />
-              <span>Appearance</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Customize the look and feel of the app.
-            </p>
-            {/* Add color theme options here */}
-            <Button variant="outline" disabled>
-              Customize Theme (Coming Soon)
+            <Button 
+              onClick={handleUpdateProfile}
+              disabled={isUpdating || !fullName.trim() || fullName === userProfile?.full_name}
+              className="bg-[hsl(var(--university-primary))] hover:bg-[hsl(var(--university-primary))]/90"
+            >
+              {isUpdating ? 'Updating...' : 'Update Profile'}
             </Button>
           </CardContent>
         </Card>
 
         {/* Notification Preferences */}
-        <Card className="shadow-sm border-0 bg-white/50 backdrop-blur-sm">
+        <Card>
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Bell className="h-5 w-5 text-primary" />
-              <span>Notifications</span>
-            </CardTitle>
+            <CardTitle>Notification Preferences</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Manage your notification preferences.
-            </p>
-            {/* Add notification options here */}
-            <Button variant="outline" disabled>
-              Edit Preferences (Coming Soon)
+          <CardContent className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label className="text-base">Game reminders</Label>
+                <p className="text-sm text-muted-foreground">
+                  Get notified before your scheduled games
+                </p>
+              </div>
+              <Switch
+                checked={notifications.gameReminders}
+                onCheckedChange={(checked) => 
+                  setNotifications(prev => ({ ...prev, gameReminders: checked }))
+                }
+              />
+            </div>
+            <Separator />
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label className="text-base">Game invites</Label>
+                <p className="text-sm text-muted-foreground">
+                  Receive notifications when invited to games
+                </p>
+              </div>
+              <Switch
+                checked={notifications.gameInvites}
+                onCheckedChange={(checked) => 
+                  setNotifications(prev => ({ ...prev, gameInvites: checked }))
+                }
+              />
+            </div>
+            <Separator />
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label className="text-base">Last-minute openings</Label>
+                <p className="text-sm text-muted-foreground">
+                  Get notified when spots open up in games you're interested in
+                </p>
+              </div>
+              <Switch
+                checked={notifications.lastMinuteOpenings}
+                onCheckedChange={(checked) => 
+                  setNotifications(prev => ({ ...prev, lastMinuteOpenings: checked }))
+                }
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Privacy */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Privacy</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label className="text-base">Allow others to view my profile</Label>
+                <p className="text-sm text-muted-foreground">
+                  Other users can see your basic profile information
+                </p>
+              </div>
+              <Switch
+                checked={allowProfileView}
+                onCheckedChange={setAllowProfileView}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Sign Out */}
+        <Card>
+          <CardContent className="pt-6">
+            <Button
+              onClick={signOut}
+              variant="destructive"
+              className="w-full"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign Out
             </Button>
           </CardContent>
         </Card>
       </div>
+
+      <AppSidebar 
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
     </div>
   );
 };

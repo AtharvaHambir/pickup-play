@@ -1,159 +1,199 @@
-import React, { useState } from 'react';
-import { ArrowLeft, Menu, Trophy, Calendar, MapPin, Users } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { useUniversityTheme } from '@/hooks/useUniversityTheme';
-import AppSidebar from '@/components/AppSidebar';
 
-const MyGames: React.FC = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { MapPin, Clock, Calendar, LogOut, Menu } from 'lucide-react';
+import { format } from 'date-fns';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUniversity } from '@/hooks/useUniversity';
+import { useUniversityTheme } from '@/hooks/useUniversityTheme';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
+import BottomNavigation from '@/components/BottomNavigation';
+import AppSidebar from '@/components/AppSidebar';
+import { getUniversityAbbreviation } from '@/utils/universityAbbreviations';
+
+const MyGames = () => {
+  const { user } = useAuth();
+  const { university } = useUniversity();
+  const { toast } = useToast();
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  
+  // Apply university-specific theming
   useUniversityTheme();
 
-  const handleBack = () => {
-    navigate(-1);
+  const { data: games, refetch } = useQuery({
+    queryKey: ['my-games', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      
+      const { data, error } = await supabase
+        .from('participants')
+        .select(`
+          *,
+          game:games (
+            *,
+            participants (user_id, status),
+            creator:created_by (full_name)
+          )
+        `)
+        .eq('user_id', user.id)
+        .eq('status', 'joined');
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id
+  });
+
+  const handleLeaveGame = async (gameId: string) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('participants')
+        .delete()
+        .eq('game_id', gameId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Left Game",
+        description: "You've successfully left the game."
+      });
+
+      refetch();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
   };
 
-  const games = [
-    {
-      id: 1,
-      title: 'Basketball Game',
-      date: 'October 28, 2023',
-      time: '7:00 PM',
-      location: 'Recreation Center Gym',
-      players: 8,
-    },
-    {
-      id: 2,
-      title: 'Intramural Soccer',
-      date: 'October 29, 2023',
-      time: '2:00 PM',
-      location: 'Sports Field 1',
-      players: 15,
-    },
-    {
-      id: 3,
-      title: 'Tennis Doubles',
-      date: 'October 30, 2023',
-      time: '4:00 PM',
-      location: 'Tennis Courts',
-      players: 4,
-    },
-  ];
+  const getSportEmoji = (sport: string) => {
+    const sportEmojis: { [key: string]: string } = {
+      'Basketball': '🏀',
+      'Soccer': '⚽',
+      'Tennis': '🎾',
+      'Volleyball': '🏐',
+      'Football': '🏈',
+      'Cricket': '🏏',
+      'Softball': '🥎',
+      'Badminton': '🏸',
+      'Spikeball': '⚪',
+      'Cycling': '🚴',
+      'Ultimate Frisbee': '🥏'
+    };
+    return sportEmojis[sport] || '🏃';
+  };
+
+  const universityAbbreviation = getUniversityAbbreviation(university?.domain || '');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20">
-      <AppSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-gradient-to-r from-[hsl(var(--university-primary))] to-[hsl(var(--university-secondary))] text-white">
-        <div className="max-w-6xl mx-auto px-4 py-6">
+      <header className="bg-gradient-to-r from-[hsl(var(--university-primary))] to-[hsl(var(--university-secondary))] text-white">
+        <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Trophy className="h-8 w-8" />
-              <div>
-                <h1 className="text-3xl font-bold">My Games</h1>
-                <p className="text-white/80">Track your gaming activity</p>
-              </div>
+            <div>
+              <h1 className="text-3xl font-bold">PickupPlay</h1>
+              <p className="text-white/80">My Games</p>
             </div>
-            <Button
-              onClick={() => setSidebarOpen(true)}
-              variant="ghost"
-              className="text-white hover:bg-white/20 lg:hidden"
-            >
-              <Menu className="h-6 w-6" />
-            </Button>
+            <div className="flex items-center space-x-3">
+              <Badge className="bg-white/20 text-white border-white/30">
+                {universityAbbreviation}
+              </Badge>
+              <Button
+                onClick={() => setSidebarOpen(true)}
+                variant="ghost"
+                size="sm"
+                className="text-white hover:bg-white/20"
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
-          
-          {/* Back Button */}
-          <Button
-            onClick={handleBack}
-            variant="ghost"
-            className="mt-4 text-white hover:bg-white/20"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-        {/* Upcoming Games Section */}
-        <Card className="shadow-sm border-0 bg-white/50 backdrop-blur-sm">
+      <div className="max-w-6xl mx-auto px-4 py-8 pb-32">
+        <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Calendar className="h-5 w-5 text-primary" />
-              <span>Upcoming Games</span>
+            <CardTitle className="flex items-center">
+              <Calendar className="h-5 w-5 mr-2 text-primary" />
+              My Games ({games?.length || 0})
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {games.length > 0 ? (
-              <ul className="space-y-4">
-                {games.map((game) => (
-                  <li key={game.id} className="border rounded-md p-4">
-                    <div className="font-semibold">{game.title}</div>
-                    <div className="text-sm text-muted-foreground">
-                      <Calendar className="h-4 w-4 inline-block mr-1" />
-                      {game.date}, {game.time}
+          <CardContent>
+            {games && games.length > 0 ? (
+              <div className="space-y-4">
+                {games.map((userGame) => (
+                  <div key={userGame.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-xl">{getSportEmoji(userGame.game.sport)}</span>
+                        <h3 className="font-semibold text-foreground">{userGame.game.sport}</h3>
+                      </div>
+                      <Badge variant="outline" className="text-xs">
+                        {userGame.game.participants.filter((p: any) => p.status === 'joined').length}/{userGame.game.max_participants} players
+                      </Badge>
                     </div>
-                    <div className="text-sm text-muted-foreground">
-                      <MapPin className="h-4 w-4 inline-block mr-1" />
-                      {game.location}
+                    <div className="space-y-1 text-sm text-muted-foreground mb-3">
+                      <div className="flex items-center">
+                        <Clock className="h-3 w-3 mr-2" />
+                        {format(new Date(userGame.game.date_time), 'MMM d, yyyy • h:mm a')} • {userGame.game.duration} min
+                      </div>
+                      <div className="flex items-center">
+                        <MapPin className="h-3 w-3 mr-2" />
+                        {userGame.game.location}
+                      </div>
                     </div>
-                    <div className="text-sm text-muted-foreground">
-                      <Users className="h-4 w-4 inline-block mr-1" />
-                      {game.players} Players
+                    <div className="flex justify-between items-center">
+                      <p className="text-xs text-muted-foreground">
+                        Created by {userGame.game.creator?.full_name || 'Anonymous'}
+                      </p>
+                      <Button 
+                        variant="destructive" 
+                        size="sm"
+                        onClick={() => handleLeaveGame(userGame.game.id)}
+                        className="text-xs"
+                      >
+                        <LogOut className="h-3 w-3 mr-1" />
+                        Leave Game
+                      </Button>
                     </div>
-                  </li>
+                  </div>
                 ))}
-              </ul>
+              </div>
             ) : (
               <div className="text-center py-8">
                 <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">No upcoming games scheduled.</p>
+                <p className="text-muted-foreground">You haven't joined any games yet</p>
+                <Button 
+                  onClick={() => navigate('/')}
+                  className="mt-4"
+                >
+                  Find Games to Join
+                </Button>
               </div>
             )}
           </CardContent>
         </Card>
-
-        {/* Game Stats Section */}
-        <Card className="shadow-sm border-0 bg-white/50 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle>Game Stats</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <div className="text-xl font-semibold">Total Games Played</div>
-                <div className="text-2xl font-bold text-primary">15</div>
-              </div>
-              <div>
-                <div className="text-xl font-semibold">Average Players per Game</div>
-                <div className="text-2xl font-bold text-primary">12</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Quick Actions */}
-        <Card className="shadow-sm border-0 bg-white/50 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Button className="w-full justify-start" variant="outline">
-              <Calendar className="h-4 w-4 mr-2" />
-              Schedule a New Game
-            </Button>
-            <Button className="w-full justify-start" variant="outline" disabled>
-              <MapPin className="h-4 w-4 mr-2" />
-              Find Game Locations (Coming Soon)
-            </Button>
-          </CardContent>
-        </Card>
       </div>
+
+      <AppSidebar 
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
+
+      <BottomNavigation />
     </div>
   );
 };
