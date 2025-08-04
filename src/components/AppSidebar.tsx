@@ -1,11 +1,12 @@
 
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Home, Calendar, Trophy, User, Settings, LogOut, X, Users, HelpCircle, FileText, Shield } from 'lucide-react';
+import { Home, Calendar, Trophy, User, Settings, LogOut, X, Users, HelpCircle, FileText, Shield, Scale } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUniversity } from '@/hooks/useUniversity';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { getUniversityAbbreviation } from '@/utils/universityAbbreviations';
 
 interface AppSidebarProps {
@@ -27,6 +28,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isOpen, onClose }) => {
     { title: 'Help & Support', url: '/help-support', icon: HelpCircle },
     { title: 'Terms of Use', url: '/terms-of-use', icon: FileText },
     { title: 'Privacy Policy', url: '/privacy-policy', icon: Shield },
+    { title: 'Licensing & Safety', url: '/licensing-and-safety', icon: Scale },
   ];
 
   const universityAbbreviation = university ? getUniversityAbbreviation(university.domain) : '';
@@ -79,29 +81,31 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isOpen, onClose }) => {
             </div>
           </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 p-4">
-            <ul className="space-y-2">
-              {menuItems.map((item) => (
-                <li key={item.title}>
-                  <NavLink
-                    to={item.url}
-                    onClick={handleNavClick}
-                    className={({ isActive }) =>
-                      `flex items-center space-x-3 w-full p-3 rounded-lg transition-colors ${
-                        isActive
-                          ? 'bg-[hsl(var(--university-primary))]/10 text-[hsl(var(--university-primary))] border border-[hsl(var(--university-primary))]/20'
-                          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                      }`
-                    }
-                  >
-                    <item.icon className="h-5 w-5" />
-                    <span className="font-medium">{item.title}</span>
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          {/* Navigation with Scroll Area */}
+          <ScrollArea className="flex-1 p-4">
+            <nav>
+              <ul className="space-y-2">
+                {menuItems.map((item) => (
+                  <li key={item.title}>
+                    <NavLink
+                      to={item.url}
+                      onClick={handleNavClick}
+                      className={({ isActive }) =>
+                        `flex items-center space-x-3 w-full p-3 rounded-lg transition-colors ${
+                          isActive
+                            ? 'bg-[hsl(var(--university-primary))]/10 text-[hsl(var(--university-primary))] border border-[hsl(var(--university-primary))]/20'
+                            : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                        }`
+                      }
+                    >
+                      <item.icon className="h-5 w-5" />
+                      <span className="font-medium">{item.title}</span>
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </ScrollArea>
 
           {/* Bottom Section */}
           <div className="p-4 border-t">
