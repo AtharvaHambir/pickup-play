@@ -15,6 +15,7 @@ import MyGames from "@/pages/MyGames";
 import Settings from "@/pages/Settings";
 import Friends from "@/pages/Friends";
 import HelpSupport from "@/pages/HelpSupport";
+import TermsOfUse from "@/pages/TermsOfUse";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -71,6 +72,11 @@ const App = () => (
               <Route path="/help-support" element={
                 <ProtectedRoute>
                   <HelpSupport />
+                </ProtectedRoute>
+              } />
+              <Route path="/terms-of-use" element={
+                <ProtectedRoute>
+                  <TermsOfUse />
                 </ProtectedRoute>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
