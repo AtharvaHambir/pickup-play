@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Home, Calendar, Trophy, User, Settings, LogOut, X, Users, HelpCircle } from 'lucide-react';
+import { Home, Calendar, Trophy, User, Settings, LogOut, X, Users, HelpCircle, FileText, Shield } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUniversity } from '@/hooks/useUniversity';
 import { Button } from '@/components/ui/button';
@@ -25,6 +25,8 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isOpen, onClose }) => {
     { title: 'Profile', url: '/profile', icon: User },
     { title: 'Settings', url: '/settings', icon: Settings },
     { title: 'Help & Support', url: '/help-support', icon: HelpCircle },
+    { title: 'Terms of Use', url: '/terms-of-use', icon: FileText },
+    { title: 'Privacy Policy', url: '/privacy-policy', icon: Shield },
   ];
 
   const universityAbbreviation = university ? getUniversityAbbreviation(university.domain) : '';

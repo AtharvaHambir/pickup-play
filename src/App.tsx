@@ -16,6 +16,7 @@ import Settings from "@/pages/Settings";
 import Friends from "@/pages/Friends";
 import HelpSupport from "@/pages/HelpSupport";
 import TermsOfUse from "@/pages/TermsOfUse";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -77,6 +78,11 @@ const App = () => (
               <Route path="/terms-of-use" element={
                 <ProtectedRoute>
                   <TermsOfUse />
+                </ProtectedRoute>
+              } />
+              <Route path="/privacy-policy" element={
+                <ProtectedRoute>
+                  <PrivacyPolicy />
                 </ProtectedRoute>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
