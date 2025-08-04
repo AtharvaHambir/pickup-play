@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,6 +16,7 @@ import Friends from "@/pages/Friends";
 import HelpSupport from "@/pages/HelpSupport";
 import TermsOfUse from "@/pages/TermsOfUse";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import LicensingAndSafety from "@/pages/LicensingAndSafety";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -83,6 +83,11 @@ const App = () => (
               <Route path="/privacy-policy" element={
                 <ProtectedRoute>
                   <PrivacyPolicy />
+                </ProtectedRoute>
+              } />
+              <Route path="/licensing-and-safety" element={
+                <ProtectedRoute>
+                  <LicensingAndSafety />
                 </ProtectedRoute>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
