@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Toaster } from "@/components/ui/toaster"
@@ -6,20 +5,20 @@ import { TooltipProvider } from "@/components/ui/tooltip"
 import { AuthProvider } from './contexts/AuthContext';
 import { QueryClient } from './contexts/QueryClient';
 import ProtectedRoute from './components/ProtectedRoute';
-import Index from './pages/Index';
-import Auth from './pages/Auth';
-import Calendar from './pages/Calendar';
-import MyGames from './pages/MyGames';
-import Profile from './pages/Profile';
-import Settings from './pages/Settings';
-import Friends from './pages/Friends';
-import Create from './pages/Create';
-import Competitions from './pages/Competitions';
-import UniversityDashboard from './pages/UniversityDashboard';
-import HelpSupport from './pages/HelpSupport';
-import TermsOfUse from './pages/TermsOfUse';
-import PrivacyPolicy from './pages/PrivacyPolicy';
-import NotFound from './pages/NotFound';
+import Index from './pages/index';
+import Auth from './pages/auth';
+import Calendar from './pages/calendar';
+import MyGames from './pages/my-games';
+import Profile from './pages/profile';
+import Settings from './pages/settings';
+import Friends from './pages/friends';
+import Create from './pages/create';
+import Competitions from './pages/competitions';
+import UniversityDashboard from './pages/university-dashboard';
+import HelpSupport from './pages/help-support';
+import TermsOfUse from './pages/terms-of-use';
+import PrivacyPolicy from './pages/privacy-policy';
+import NotFound from './pages/not-found';
 import LicensingAndSafety from './pages/LicensingAndSafety';
 
 function App() {
