@@ -18,13 +18,14 @@ export function useUser() {
     queryKey: ["currentUser"],
     queryFn: async (): Promise<CurrentUser | null> => {
       const {
-        data: {
-          user,
-        },
+        data: { user },
         error: authError,
       } = await supabase.auth.getUser();
 
-      if (authError || !user) return null;
+      if (authError || !user) {
+        console.error("Auth error:", authError?.message);
+        return null;
+      }
 
       // First try to select with role column
       let { data, error } = await supabase
@@ -56,6 +57,11 @@ export function useUser() {
 
       if (error) {
         console.error("Failed to fetch user profile:", error.message);
+        return null;
+      }
+
+      if (!data) {
+        console.error("No user data found");
         return null;
       }
 
