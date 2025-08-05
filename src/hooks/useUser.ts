@@ -26,11 +26,33 @@ export function useUser() {
 
       if (authError || !user) return null;
 
-      const { data, error } = await supabase
+      // First try to select with role column
+      let { data, error } = await supabase
         .from("users")
         .select("id, email, full_name, role, university_id, university_domain")
         .eq("id", user.id)
         .single();
+
+      // If role column doesn't exist, fall back to selecting without it
+      if (error && error.message.includes("column \"role\" does not exist")) {
+        console.log("Role column not found, falling back to default selection");
+        const fallbackResult = await supabase
+          .from("users")
+          .select("id, email, full_name, university_id, university_domain")
+          .eq("id", user.id)
+          .single();
+        
+        if (fallbackResult.error) {
+          console.error("Failed to fetch user profile:", fallbackResult.error.message);
+          return null;
+        }
+        
+        // Default to 'user' role when column doesn't exist
+        return {
+          ...fallbackResult.data,
+          role: 'user' as UserRole
+        } as CurrentUser;
+      }
 
       if (error) {
         console.error("Failed to fetch user profile:", error.message);
