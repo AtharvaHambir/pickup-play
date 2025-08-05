@@ -51,7 +51,7 @@ export function useUser() {
         return {
           ...fallbackResult.data,
           role: 'user' as UserRole
-        } as CurrentUser;
+        };
       }
 
       if (error) {
@@ -59,7 +59,7 @@ export function useUser() {
         return null;
       }
 
-      return data as CurrentUser;
+      return data;
     },
   });
 }
