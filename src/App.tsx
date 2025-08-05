@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,6 +18,7 @@ import HelpSupport from "@/pages/HelpSupport";
 import TermsOfUse from "@/pages/TermsOfUse";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import LicensingAndSafety from "@/pages/LicensingAndSafety";
+import Admin from "@/pages/Admin";
 import Unauthorized from "@/pages/Unauthorized";
 import NotFound from "./pages/NotFound";
 
@@ -89,6 +91,11 @@ const App = () => (
               <Route path="/licensing-and-safety" element={
                 <ProtectedRoute>
                   <LicensingAndSafety />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin" element={
+                <ProtectedRoute>
+                  <Admin />
                 </ProtectedRoute>
               } />
               <Route path="/unauthorized" element={<Unauthorized />} />
