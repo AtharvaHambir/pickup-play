@@ -13,7 +13,7 @@ export default function AdminProtectedRoute({ children, allowedRoles }: AdminPro
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isLoading && (!user || !allowedRoles.includes(user.role))) {
+    if (!isLoading && (!user || !allowedRoles.includes(user.role as "global_admin" | "university_admin"))) {
       navigate("/unauthorized");
     }
   }, [user, isLoading, allowedRoles, navigate]);
@@ -26,7 +26,7 @@ export default function AdminProtectedRoute({ children, allowedRoles }: AdminPro
     );
   }
 
-  if (!user || !allowedRoles.includes(user.role)) {
+  if (!user || !allowedRoles.includes(user.role as "global_admin" | "university_admin")) {
     return null;
   }
 
