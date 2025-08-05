@@ -17,6 +17,7 @@ import HelpSupport from "@/pages/HelpSupport";
 import TermsOfUse from "@/pages/TermsOfUse";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import LicensingAndSafety from "@/pages/LicensingAndSafety";
+import Unauthorized from "@/pages/Unauthorized";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -90,6 +91,7 @@ const App = () => (
                   <LicensingAndSafety />
                 </ProtectedRoute>
               } />
+              <Route path="/unauthorized" element={<Unauthorized />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
