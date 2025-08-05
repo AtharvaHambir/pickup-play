@@ -43,8 +43,8 @@ export function useUser() {
           .eq("id", user.id)
           .single();
         
-        if (fallbackResult.error) {
-          console.error("Failed to fetch user profile:", fallbackResult.error.message);
+        if (fallbackResult.error || !fallbackResult.data) {
+          console.error("Failed to fetch user profile:", fallbackResult.error?.message);
           return null;
         }
         
