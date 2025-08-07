@@ -14,7 +14,7 @@ interface CurrentUser {
 }
 
 export function useUser() {
-  return useQuery<CurrentUser | null>({
+  const query = useQuery<CurrentUser | null>({
     queryKey: ["currentUser"],
     queryFn: async (): Promise<CurrentUser | null> => {
       try {
@@ -73,4 +73,12 @@ export function useUser() {
       }
     },
   });
+
+  return {
+    data: query.data,
+    user: query.data,
+    isLoading: query.isLoading,
+    loading: query.isLoading,
+    error: query.error
+  };
 }
