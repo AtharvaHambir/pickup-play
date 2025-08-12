@@ -49,14 +49,10 @@ export function useUser() {
             return null;
           }
           
-          // Hardcode admin role for specific email
-          const role: UserRole = fallbackResult.data.email === 'hambir.a@northeastern.edu' 
-            ? 'global_admin' 
-            : 'user';
-          
+          // Default to 'user' role when column doesn't exist
           return {
             ...fallbackResult.data,
-            role
+            role: 'user' as UserRole
           };
         }
 
@@ -68,11 +64,6 @@ export function useUser() {
         if (!data) {
           console.error("No user data found");
           return null;
-        }
-
-        // Hardcode admin role for specific email even if role column exists
-        if (data.email === 'hambir.a@northeastern.edu') {
-          data.role = 'global_admin';
         }
 
         return data;
