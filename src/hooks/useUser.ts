@@ -7,7 +7,7 @@ type UserRole = "global_admin" | "university_admin" | "user";
 interface CurrentUser {
   id: string;
   email: string;
-  full_name: string;
+  full_name: string | null;
   role: UserRole;
   university_id: string | null;
   university_domain: string | null;

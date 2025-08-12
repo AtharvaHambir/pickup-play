@@ -19,6 +19,7 @@ import TermsOfUse from "@/pages/TermsOfUse";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import LicensingAndSafety from "@/pages/LicensingAndSafety";
 import Admin from "@/pages/Admin";
+import AdminDashboard from "@/pages/AdminDashboard";
 import Unauthorized from "@/pages/Unauthorized";
 import NotFound from "./pages/NotFound";
 
@@ -96,6 +97,11 @@ const App = () => (
               <Route path="/admin" element={
                 <ProtectedRoute>
                   <Admin />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin-dashboard" element={
+                <ProtectedRoute>
+                  <AdminDashboard />
                 </ProtectedRoute>
               } />
               <Route path="/unauthorized" element={<Unauthorized />} />

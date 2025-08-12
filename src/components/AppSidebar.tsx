@@ -3,6 +3,7 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Home, Calendar, Trophy, User, Settings, LogOut, X, Users, HelpCircle, FileText, Shield, ShieldCheck } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUser } from '@/hooks/useUser';
 import { useUniversity } from '@/hooks/useUniversity';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -16,9 +17,12 @@ interface AppSidebarProps {
 
 const AppSidebar: React.FC<AppSidebarProps> = ({ isOpen, onClose }) => {
   const { signOut } = useAuth();
+  const { data: user } = useUser();
   const { university } = useUniversity();
 
-  const menuItems = [
+  const isAdmin = user?.role === 'global_admin' || user?.role === 'university_admin';
+
+  const baseMenuItems = [
     { title: 'Dashboard', url: '/', icon: Home },
     { title: 'Calendar', url: '/calendar', icon: Calendar },
     { title: 'My Games', url: '/my-games', icon: Trophy },
@@ -30,6 +34,11 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isOpen, onClose }) => {
     { title: 'Privacy Policy', url: '/privacy-policy', icon: Shield },
     { title: 'Licensing & Safety', url: '/licensing-and-safety', icon: ShieldCheck },
   ];
+
+  const adminMenuItem = { title: 'Admin Dashboard', url: '/admin-dashboard', icon: Shield };
+
+  // Add admin menu item if user is admin
+  const menuItems = isAdmin ? [...baseMenuItems, adminMenuItem] : baseMenuItems;
 
   const universityAbbreviation = university ? getUniversityAbbreviation(university.domain) : '';
 
