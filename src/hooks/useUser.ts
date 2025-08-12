@@ -28,7 +28,7 @@ export function useUser() {
           return null;
         }
 
-        // First try to select with role column
+        // Try to select with role column first
         let { data, error } = await supabase
           .from("users")
           .select("id, email, full_name, role, university_id, university_domain")
