@@ -17,45 +17,55 @@ export function useUser() {
   const query = useQuery<CurrentUser | null>({
     queryKey: ["currentUser"],
     queryFn: async (): Promise<CurrentUser | null> => {
-      try {
-        const {
-          data: { user },
-          error: authError,
-        } = await supabase.auth.getUser();
+      // 1. Get the authenticated user from Supabase auth
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
 
-        if (authError || !user) {
-          console.error("Auth error:", authError?.message);
-          return null;
-        }
-
-        const { data, error } = await supabase
-          .from("users")
-          .select("id, email, full_name, role, university_id, university_domain")
-          .eq("id", user.id)
-          .single();
-
-        if (error) {
-          console.error("Failed to fetch user profile:", error.message);
-          return null;
-        }
-        
-        if (!data) {
-            console.error("No user data found");
-            return null;
-        }
-
-        // Ensure the role is correctly typed, defaulting to 'user' if it's missing.
-        const finalData: CurrentUser = {
-            ...data,
-            role: data.role as UserRole || 'user',
-        };
-
-        return finalData;
-
-      } catch (error) {
-        console.error("Unexpected error in useUser:", error);
+      if (authError || !user) {
+        console.error("Authentication error:", authError?.message);
         return null;
       }
+
+      // 2. Fetch the user's profile from the 'users' table
+      const { data: userData, error: profileError } = await supabase
+        .from("users")
+        .select("id, email, full_name, role, university_id, university_domain")
+        .eq("id", user.id)
+        .single();
+
+      // 3. Handle errors or cases where no profile is found
+      if (profileError) {
+        // This handles cases like the 'role' column not existing, but gracefully.
+        console.error("Failed to fetch user profile:", profileError.message);
+        // Attempt a fallback fetch without the role if that was the issue
+        if (profileError.message.includes('column "role" does not exist')) {
+            const { data: fallbackData, error: fallbackError } = await supabase
+              .from("users")
+              .select("id, email, full_name, university_id, university_domain")
+              .eq("id", user.id)
+              .single();
+
+            if (fallbackError || !fallbackData) {
+                console.error("Fallback fetch failed:", fallbackError?.message);
+                return null;
+            }
+            return { ...fallbackData, role: 'user' as UserRole }; // Default role to 'user'
+        }
+        return null;
+      }
+
+      if (!userData) {
+        console.error("No user profile data found for the authenticated user.");
+        return null;
+      }
+      
+      // 4. Ensure the role is correctly typed and return the user data
+      return {
+        ...userData,
+        role: (userData.role as UserRole) || 'user', // Default to 'user' if role is null/undefined
+      };
     },
   });
 
