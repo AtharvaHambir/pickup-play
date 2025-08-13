@@ -17,11 +17,8 @@ export function useUser() {
   const query = useQuery<CurrentUser | null>({
     queryKey: ["currentUser"],
     queryFn: async (): Promise<CurrentUser | null> => {
-      // 1. Get the authenticated user from Supabase auth
-      const {
-        data: { user },
-        error: authError,
-      } = await supabase.auth.getUser();
+      // 1. Get the authenticated user
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
 
       if (authError || !user) {
         console.error("Authentication error:", authError?.message);
@@ -34,12 +31,11 @@ export function useUser() {
         .select("id, email, full_name, role, university_id, university_domain")
         .eq("id", user.id)
         .single();
-
-      // 3. Handle errors or cases where no profile is found
+      
+      // 3. Handle profile query errors FIRST
       if (profileError) {
-        // This handles cases like the 'role' column not existing, but gracefully.
         console.error("Failed to fetch user profile:", profileError.message);
-        // Attempt a fallback fetch without the role if that was the issue
+        // Fallback for when the 'role' column doesn't exist
         if (profileError.message.includes('column "role" does not exist')) {
             const { data: fallbackData, error: fallbackError } = await supabase
               .from("users")
@@ -48,23 +44,26 @@ export function useUser() {
               .single();
 
             if (fallbackError || !fallbackData) {
-                console.error("Fallback fetch failed:", fallbackError?.message);
+                console.error("Fallback profile fetch failed:", fallbackError?.message);
                 return null;
             }
-            return { ...fallbackData, role: 'user' as UserRole }; // Default role to 'user'
+            // Return user data with a default 'user' role
+            return { ...fallbackData, role: 'user' as UserRole };
         }
+        // For any other profile error, return null
         return null;
       }
 
+      // 4. Handle case where no data is returned
       if (!userData) {
-        console.error("No user profile data found for the authenticated user.");
+        console.error("No user profile data found.");
         return null;
       }
       
-      // 4. Ensure the role is correctly typed and return the user data
+      // 5. Success: return the user data with a correctly typed role
       return {
         ...userData,
-        role: (userData.role as UserRole) || 'user', // Default to 'user' if role is null/undefined
+        role: (userData.role as UserRole) || 'user', // Default to 'user' if role is null
       };
     },
   });
