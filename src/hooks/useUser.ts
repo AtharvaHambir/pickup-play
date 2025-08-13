@@ -28,45 +28,30 @@ export function useUser() {
           return null;
         }
 
-        // Try to select with role column first
-        let { data, error } = await supabase
+        const { data, error } = await supabase
           .from("users")
           .select("id, email, full_name, role, university_id, university_domain")
           .eq("id", user.id)
           .single();
 
-        // If role column doesn't exist, fall back to selecting without it
-        if (error && error.message.includes("column \"role\" does not exist")) {
-          console.log("Role column not found, falling back to default selection");
-          const fallbackResult = await supabase
-            .from("users")
-            .select("id, email, full_name, university_id, university_domain")
-            .eq("id", user.id)
-            .single();
-          
-          if (fallbackResult.error || !fallbackResult.data) {
-            console.error("Failed to fetch user profile:", fallbackResult.error?.message);
-            return null;
-          }
-          
-          // Default to 'user' role when column doesn't exist
-          return {
-            ...fallbackResult.data,
-            role: 'user' as UserRole
-          };
-        }
-
         if (error) {
           console.error("Failed to fetch user profile:", error.message);
           return null;
         }
-
+        
         if (!data) {
-          console.error("No user data found");
-          return null;
+            console.error("No user data found");
+            return null;
         }
 
-        return data;
+        // Ensure the role is correctly typed, defaulting to 'user' if it's missing.
+        const finalData: CurrentUser = {
+            ...data,
+            role: data.role as UserRole || 'user',
+        };
+
+        return finalData;
+
       } catch (error) {
         console.error("Unexpected error in useUser:", error);
         return null;
@@ -79,6 +64,6 @@ export function useUser() {
     user: query.data,
     isLoading: query.isLoading,
     loading: query.isLoading,
-    error: query.error
+    error: query.error,
   };
 }
