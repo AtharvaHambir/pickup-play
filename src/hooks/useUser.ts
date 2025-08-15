@@ -18,38 +18,43 @@ export function useUser() {
     queryKey: ["currentUser"],
     queryFn: async (): Promise<CurrentUser | null> => {
       // 1. Get the authenticated user
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
 
       if (authError || !user) {
         console.error("Authentication error:", authError?.message);
         return null;
       }
 
-      // 2. Fetch the user's profile from the 'users' table
-      const { data: userData, error: profileError } = await supabase
+      // 2. Fetch the user's profile from the 'users' table.
+      // We cast the result to `any` to bypass the outdated type definitions,
+      // as our database now has a 'role' column that the types file doesn't know about.
+      const { data, error } = (await supabase
         .from("users")
         .select("id, email, full_name, role, university_id, university_domain")
         .eq("id", user.id)
-        .single();
-      
-      // 3. Handle any errors during the profile fetch
-      if (profileError) {
-        console.error("Failed to fetch user profile:", profileError.message);
+        .single()) as { data: any; error: any };
+
+      // 3. Handle any errors or if no data is returned
+      if (error || !data) {
+        console.error("Error fetching user profile:", error?.message);
         return null;
       }
 
-      // 4. Handle the case where the query succeeded but found no user data
-      if (!userData) {
-        console.error("No user profile data found for the authenticated user.");
-        return null;
-      }
-      
-      // 5. If we get here, the query was successful and data exists.
-      // Now it's safe to return the user data.
-      return {
-        ...userData,
-        role: (userData.role as UserRole) || 'user', // Default to 'user' if role is null
+      // 4. If the query is successful, construct the CurrentUser object.
+      // This is now safe because we've already checked for errors.
+      const currentUser: CurrentUser = {
+        id: data.id,
+        email: data.email,
+        full_name: data.full_name,
+        university_id: data.university_id,
+        university_domain: data.university_domain,
+        role: (data.role as UserRole) || "user", // Safely assign the role, defaulting to 'user'
       };
+
+      return currentUser;
     },
   });
 
